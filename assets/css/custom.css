@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap');
+/* 
+body {
+  font-family: 'Poppins', sans-serif;
+  color: rgb(231, 61, 61);
+} */
+
+/* navBar */
+#header .nav-link:hover, #header .nav-link.active, #header .nav-link:focus {
+  border-bottom: solid 1px #FFD700;
+  color: #FFD700;
+}
+.nav-item.active{
+  border-bottom: solid 1px #FFD700;
+  color: #FFD700;
+}
+.text-limit{
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+/* carousel */
+ 
+
+
+
+.carousel-item {
+  width: 100%;
+  max-height: 800px;
+  background: no-repeat scroll center scroll;
+  -webkit-background-size: contain;
+  background-size: contain;
+}
+/*.carousel-item::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  /*background: #000;
+  opacity: 0.5;
+  background: linear-gradient(rgba(255,255,255,0), rgba(0,0,0,0.9));
+}*/
+
+.carousel-item::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 50%;
+  /*background: #000;
+  opacity: 0.5;*/
+  background: linear-gradient(to bottom,rgba(255, 255, 255, 0), rgb(0, 0, 0));
+  }
+
+.carousel-caption{
+  bottom: 50px;
+  padding-left: 100px;
+  padding-right: 100px;
+}
+
+.carousel-caption h5{
+  font-size: 100px;
+  font-weight: 600;
+
+}
+
+.carousel-caption p{
+  font-size: 25px;
+  top: 2rem;
+
+}
+
+
+
+/*  event page */
+.card-event:hover{
+
+
+  transform: scale(1.1);
+  transition: .5s ease;
+  z-index: 2;
+  cursor: pointer;
+
+}
+.card-event{
+
+  z-index: 2;
+  cursor: pointer;
+
+}
+.card-event-home  {
+  z-index: 2;
+  cursor: pointer;
+  cursor: pointer;
+}
+.card-img-top {
+  width: 100%;
+  height: 15vw;
+  object-fit: cover;
+}
+
+/*  event detail page */
+
+.hero-section .img-fluid {
+  width: 100%;
+  height: 80vh;
+  object-fit: cover;
+}
+
+/*  map page */
+.card-org{
+
+  cursor: pointer;
+}
+.card-org:hover{
+
+  transform: scale(1);
+  transition: .5s ease;
+  z-index: 2;
+  cursor: pointer;
+  color: #000000;
+  border-color: #FFD700;
+
+}
+/*  map page */
+
+
+
+
+/*  partner card */
+.card-partner:hover{
+
+
+  transform: scale(1.1);
+  transition: .5s ease;
+  z-index: 2;
+  cursor: pointer;
+
+}
+.card-partner  {
+
+  box-shadow: 0 0 40px 40px rgb(0 0 0 / 2%);
+  z-index: 1;
+
+}
+/* todo-Sesson*/
+.todo:hover{
+  transform: scale(1.1);
+  transition: .5s ease;
+  z-index: 2;
+  cursor: pointer;
+}
+
+

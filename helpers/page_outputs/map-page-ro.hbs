@@ -1,0 +1,985 @@
+{{!-- The tag below means: insert everything in this file
+into the {body} of the default.hbs template --}}
+{{!< default-ro}} {{!-- leaflet map --}} <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+
+<main class="main-wrap l-content pt-5">
+  <div class="l-content pt-5">
+    <div class="container">
+
+      <div class="md-25  text-muted">
+        <!--Search-->
+
+        <div class="container w-100">
+          <div class="d-grid col-6 mx-auto position-relative">
+
+
+            <input id="search-box" for="searchbox" class="form-control rounded-pill position-absolute" type="search"
+              placeholder="{{t " Căutare"}}" aria-label="Search">
+            <button onclick="onClickSearch(event)" id="search-button"
+              class="btn btn-warning rounded-pill position-absolute end-0" type="submit" value="Submit"><i
+                data-feather="search"></i>{{t "Căutare"}}</button>
+
+
+
+          </div>
+        </div>
+      </div>
+      <!--Find Events-->
+      <div class="Container pt-5 ">
+        <div class=" row justify-content-center  ">
+
+          <div class=" col-3 ">
+            <h5 class="ps-2">{{t "Găsiți organizație"}}</h5>
+          </div>
+          <div class=" col-8 d-flex justify-content-end flex-wrap ms-auto">
+
+            <div class="p-2 flex-fill " id=""></div>
+            <div class="p-2 flex-fill " id=""></div>
+
+            <div class="p-2 flex-fill " id="country-select-container"></div>
+            <div class="p-2 flex-fill " id="service-category-select-container"></div>
+
+            <div class="p-2 flex-fill ">
+              <button onclick="clearFilters(event)" type="button" class="btn btn-outline-secondary rounded-pill btn-sm"
+                id="clear-filter-container">{{t "Clar"}}
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+          </div>
+
+
+          <div class="row justify-content-center d-flex overflow-hidden">
+            <div class="col-4 place-Container overflow-auto" style="height: 100vh;">
+
+            </div>
+            <div class="col-8 justify-content-center " id="wrap-map">
+              <div class="w-100 " id="map" style="height: 100vh;"></div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  getUserLocationAndListOrgnization();
+  function checkUserLocation(userGeolocation) {
+
+    if (userGeolocation === undefined || userGeolocation === null) {
+      return [44.449995694666896, 26.06304141060863]; //Default location
+
+    } else {
+      return [userGeolocation.coords.latitude, userGeolocation.coords.longitude];
+    }
+
+
+  }
+  async function getUserLocationAndListOrgnization() {
+
+
+
+    if (navigator.geolocation) {
+
+      navigator.geolocation.getCurrentPosition(listOrganizationInitMap, errorCallback);
+
+
+    } else {
+
+      listOrganizationInitMap();
+    }
+
+  }
+  function getGeolocation(organisation) {
+    var geolocation = organisation.map((org) => {
+      //console.log(org.attributes.location.data.attributes.geolocation,"geolocation");
+      const latitude = org.attributes.location.data.attributes.geolocation.latitude;
+      const longitude = org.attributes.location.data.attributes.geolocation.longitude;
+      // listGeoloaction.push(latitude,longitude);
+
+
+      return [latitude, longitude];
+
+
+    });
+    return geolocation;
+  }
+
+  async function initMap(organisation, userGeolocation) {
+    //console.log(organisation, "organisation");
+    var container = L.DomUtil.get('map');
+
+    if (container != null) {
+
+      container._leaflet_id = null;
+      // container.remove();
+      const map = document.querySelector("#map");
+      const mapWrap = document.querySelector("#wrap-map");
+      map.remove();
+      mapWrap.innerHTML = `<div id="map" style="height: 100vh;"></div>`;
+    }
+
+
+    var map, markers, tileLayer;
+
+
+    var geolOrgList = organisation.map((org) => {
+      //console.log(org.attributes.location.data.attributes.geolocation,"geolocation");
+      const latitude = org.attributes.location.data?.attributes.geolocation?.latitude;
+      const longitude = org.attributes.location.data?.attributes.geolocation?.longitude;
+      // listGeoloaction.push(latitude,longitude);
+      return { geo: [latitude, longitude], organisation: org };
+
+
+    });
+
+    var userGeolocation = checkUserLocation(userGeolocation);
+    //console.log(userGeolocation, "geolocation get on browser");
+
+
+    map = L.map('map').setView(userGeolocation, 13);
+    tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    tileLayer.addTo(map);
+
+    markers = (geolOrgList) => {
+      geolOrgList.map((geolOrg) => {
+        var services = geolOrg.organisation.attributes.services.data.map((service) => {
+          return service?.attributes?.name
+        });
+        console.log(geolOrg.organisation.attributes.telephone, "telephone");
+
+        return L.marker(geolOrg.geo).addTo(map)
+          /*   .on("mouseover", function (e) {
+             var popup = L.popup()
+                 .setLatLng(geolOrg.geo)
+                 .setContent(geolOrg.organisation.attributes.name)
+                 .openOn(map);
+             })
+             .on("mouseout", function (e) {
+               map.closePopup();
+             }) */
+          .bindPopup('<center>' + `${geolOrg?.organisation?.attributes?.logotipo?.data?.attributes?.url ?
+            "<img src=" + geolOrg?.organisation?.attributes?.logotipo?.data?.attributes?.url + " style=width:50%; height:50%;>" : ""}` +
+            `</center>` + '<br/>'
+            + '<b>' + geolOrg?.organisation?.attributes?.name + '</b>'
+            + '<br/> ' + geolOrg?.organisation?.attributes?.address
+            + '<br/> ' + `${geolOrg?.organisation?.attributes?.telephone ? '<i class="bi bi-telephone-fill"></i> ' + geolOrg?.organisation?.attributes?.telephone : ""}`
+            + '<br/> ' + `${geolOrg?.organisation?.attributes?.link ? '<i class="bi bi-globe"></i> ' + '<a target=_blank href=' + '"' + geolOrg?.organisation?.attributes?.link + ' ">Website</a>' : ""}`
+            + '<br/> ' + '<ul>' + geolOrg?.organisation?.attributes?.services?.data.map((service) => {
+              console.log(service?.attributes?.name, "service");
+              return `${service?.attributes?.name ? '<li>' + service?.attributes?.name + '</li>' : ''}`
+
+
+            }).join("") + '</ul>')
+          .openPopup();
+
+
+      })
+
+    }
+
+    markers(geolOrgList);
+    //console.log(markers, "markers");
+
+
+
+
+
+  }
+
+  async function listOrganizationInitMap(userGeolocation) {
+
+
+    const countrySelectContainer = document.querySelector("#country-select-container")
+    const serviceCategorySelectContainer = document.querySelector("#service-category-select-container")
+
+    // const localeListData = await localeList.json()
+    const localeListData = [
+      {
+        id: 0,
+        name: "{{t "Selectați țări"}}",
+        value: ""
+      },
+      {
+        id: 1,
+        name: "Portugal",
+        value: "Portugal"
+      },
+      {
+        id: 2,
+        name: "Italy",
+        value: "Italy",
+      },
+      {
+        id: 3,
+        name: "Spain",
+        value: "Spain",
+      },
+      {
+        id: 4,
+        name: "France",
+        value: "France",
+      },
+      {
+        id: 5,
+        name: "Germany",
+        value: "Germany",
+      },
+
+      {
+        id: 24,
+        name: "Romania",
+        value: "Romania",
+      },
+    ]
+
+    const countrySelect = localeListData.map(locale => {
+      //locale.name = locale.name.split(" (")[0]
+      return `<option value="${locale.value}">${locale.name}</option>`
+    })
+
+    // Service category select
+    const serviceCategoryData = await fetchCategories()
+    const serviceCategorySelect = serviceCategoryData.map(category => {
+      return `<option value="${category.attributes.name}">${category.attributes.name}</option>`
+    })
+    serviceCategorySelect.splice(0, 0, `<option value="">{{t "Toate categoriile"}}</option>`)
+    serviceCategorySelectContainer.innerHTML = `<select id="service-category-select" onchange="onChangeServiceCategory(event)" class="form-select rounded-pill btn-sm" aria-label="service category list select">${serviceCategorySelect.join("")}</select>`
+
+    countrySelectContainer.innerHTML = `<select id="country-select" onchange="onChangeCountry(event)" class="form-select rounded-pill btn-sm" aria-label="country list select">${countrySelect.join("")}</select>`
+
+
+    /*
+    const request1 = await fetch("https://ipinfo.io/json?token=fe46c407100e43")
+    const json1 = await request1.json() 
+    
+    const request = await fetch("https://restcountries.com/v3.1/alpha/"+json1.country)
+    const json = await request.json() */
+
+    const request = await fetch(" https://api.vatcomply.com/geolocate")
+    const json = await request.json()
+    //console.log( json, "country_code");
+
+
+
+    //console.log(json.ip, json.country,"Ip & country");
+    // console.log( json[0].name.common," country");
+    const country = getCountryName(json.country_code)
+
+    //console.log(country, "countryyyyyyyyyyyy");
+    const countryFilterQuery = `query FilterByCountry($country: String) {organizations(filters: { location: { country: { eq: $country } } }) { `
+    const countryQueryVars = !country ? {} : {
+      "country": country
+    }
+
+
+
+    const organisation = await fetchOrgs(countryFilterQuery, countryQueryVars);
+
+    //var organisation = await getOrganization();
+    // const organisation = await fetchOrgs();
+
+
+
+
+    listorg(organisation);
+
+
+    initMap(organisation.data, userGeolocation);
+
+  }
+  async function getOrganization(id) {
+
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+
+    };
+    const graphqlQuery = {
+
+
+      //"operationName": "fetchEvent",
+      query: `query {
+        organizations {
+          data {
+            id
+            attributes {
+              name
+              description
+              address
+              telephone
+              link
+            }
+            attributes{
+              logotipo{
+                data{
+                  attributes{
+                    url
+                  }
+                }
+              }
+            }
+            attributes {
+              location {
+                data {
+                  id
+                  attributes {
+                    country
+                    City
+                    geolocation
+                  }
+                }
+              }
+            }
+              attributes {
+              services {
+                data {
+                  id
+                  attributes {
+                    name
+                    description
+                  }
+                }
+              }
+            }
+            
+          }
+        
+        }
+      }
+
+                          `,
+      // variables: { id: id }
+
+    };
+
+    const options = {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(graphqlQuery)
+
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+    console.log(data.data.organizations, "organizationnnnnnn");
+    return data.data.organizations;
+
+  }
+  async function clickToDetail(orgId) {
+    window.location.href = "{{@site.url}}/organisation-detail?orgId=" + orgId;
+  }
+  function errorCallback(error) {
+    if (error.code == error.PERMISSION_DENIED) {
+      getPositionListOrg()
+    }
+  }
+
+  function getPositionListOrg(position) {
+
+    listOrganizationInitMap(position)
+  }
+
+  async function onChangeServiceCategory(event) {
+
+    clearFilters(event)
+    const category = event.target.value;
+    const filterQuery = `query FilterByCategory($category:String){
+                    organizations(filters:{category_services:{name:{eq:$category}}}
+                    ) {
+                  `
+
+    const queryVars = !category ? {} : {
+      "category": category
+    }
+    const orgdata = await fetchOrgs(filterQuery, queryVars);
+    listorg(orgdata)
+
+    initMap(orgdata.data);
+  }
+
+  async function onChangeCountry(event) {
+    clearFilters(event)
+    const country = event.target.value;
+    const countryFilterQuery = `query FilterByCountry($country: String) {organizations(filters: { location: { country: { eq: $country } } }) { `
+    const countryQueryVars = !country ? {} : {
+      "country": country
+    }
+    const orgData = await fetchOrgs(countryFilterQuery, countryQueryVars);
+
+    listorg(orgData);
+    initMap(orgData.data);
+  }
+  async function fetchOrgs(queryFilter, queryVars) {
+    await displayLoading()
+    //console.log("after loading");
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+    };
+    const queryData = `
+            data {
+      id
+      attributes {
+        name
+        description
+        address
+          telephone
+              link
+      }
+        attributes{
+              logotipo{
+                data{
+                  attributes{
+                    url
+                  }
+                }
+              }
+            }
+      attributes {
+        location {
+          data {
+            id
+            attributes {
+              country
+              City
+              geolocation
+            }
+          }
+        }
+      }
+      attributes {
+        category_services {
+          data {
+            id
+            attributes {
+              name
+            }
+          }
+        }
+      }
+      attributes {
+        services {
+          data {
+            id
+            attributes {
+              name
+              description
+            }
+          }
+        }
+      }
+    }
+    `
+    const graphqlQuery = {
+      //"operationName": "fetchEvent",
+      //${queryFilter ? queryFilter "query($country: String) {events(filters:{location:{country:{eq:$country}}}) {" : "query{events{"}
+
+      "query": `
+          ${queryFilter ? queryFilter : "query {organizations(pagination:{pageSize:16}){"}
+          
+            ${queryData}
+          }
+          }
+`,
+      "variables": queryVars ? queryVars : {},
+    }
+
+    const options = {
+      "method": "POST",
+      "headers": headers,
+      "body": JSON.stringify(graphqlQuery)
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+
+    //console.log(data.data.organizations, "data from fetch");
+    return data.data.organizations
+  }
+
+  function listorg(orgData) {
+    console.log(orgData, "orgDatas");
+    const placeContainer = document.querySelector(".place-Container")
+    const placesList = orgData?.data.map(({ id, attributes }) => {
+      var categColor = setCategoryColor(attributes?.category_services?.data[0]?.attributes?.name)
+
+      return ` <a " onclick="clickToDetail(${id})">
+                                <div class="card mb-3 rounded card-org" style="max-width: 540px;max-height:220px">
+                                  <div class="row g-0">
+                                    <div class="col-md-4  ">
+                                   <img src="${attributes?.logotipo?.data?.attributes?.url}"
+                                        class=" h-100 img-fluid rounded" alt="..." style="with:100%; object-fit:contain;">
+                                    </div>
+                                    <div class="col-md-8">
+                                      <div class="card-body">
+                                        <h5 class="card-title text-limit fw-bold ">${attributes?.name ? attributes?.name : ""}</h5>
+                                        <p class="card-text text-limit">${attributes?.address ? attributes?.address : ""}</p>
+
+                                         <p class="card-text text-limit ">
+                                    
+         
+                                       
+
+
+                                         ${`<small    class="badge rounded-pill text-dark"  style="background-color:${categColor};"  >` +
+        (attributes?.category_services?.data[0]?.attributes?.name ? attributes?.category_services?.data[0]?.attributes?.name : "")
+        + '</small>'
+        }
+
+                                       
+                                        </p>
+
+                                 
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                    </a>`;
+    }).join("");
+
+
+    //  placeContainer.innerHTML = placeslist;
+    const eventContainer = document.querySelector(".event-container")
+    const noEventsContainer = document.querySelector("#events-container-list")
+
+    if (placesList.length > 0) {
+      placeContainer.innerHTML = placesList;
+    } else {
+      placeContainer.innerHTML = `<div class="m-recommended-slider__item swiper-slide">
+                                        <div class="m-heading no-margin">
+                                          <h3>{{t "Nu a fost găsită nicio organizație"}} </h3>
+                                          <p>
+                                            {{t "Apparently there are no organisation in this country, check again later"}} 
+                                          </p>
+                                        </div>
+                                        
+                                      </div>`;
+    }
+
+  }
+
+  async function displayLoading() {
+
+    const eventContainer = document.querySelector(".place-Container")
+    eventContainer.innerHTML =
+      `<div class="m-recommended-slider__item swiper-slide">
+                                        <div class="m-heading no-margin">
+                                          <div class="spinner-border" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                          </div>
+                                        </div>
+                                        <article class=" container pt-3" id="events-container-list">
+                                          <div class="row row-cols-1 row-cols-md-4 g-4 event-container">
+
+                                          </div>
+                                        </article>
+                                      </div>`;
+    //console.log("on loading")
+    const promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve()
+      }, 1000)
+    })
+    return promise
+  }
+  async function onClickSearch(event) {
+
+
+    const searchbox = document.querySelector("#search-box")
+    const searchButton = document.querySelector("#search-button");
+
+
+
+    searchButton.onclick = async function () {
+      clearFilters(event)
+      if (searchbox.value.length > 0) {
+
+        const filterQuery = `query  SearchByNameAndLocation($search_param:String){
+                                              organizations (filters:{or:
+                                              [
+                                                  {name:{containsi:$search_param}},
+                                                  {location:{country:{containsi:$search_param}}},
+                                                  {location:{City:{containsi:$search_param}}}
+                                              ]
+                                              }){
+                                              `
+        const queryVars = {
+          search_param: searchbox.value,
+        }
+
+        const orgdata = await fetchOrgs(filterQuery, queryVars);
+        listorg(orgdata)
+        initMap(orgdata.data);
+
+      }
+    }
+
+  }
+
+  async function clearFilters(event) {
+
+
+
+    if (event.target.id === "search-button") {
+      console.log("clear filters")
+      $("#service-category-select").val($("#service-category-select").data(""));
+      $("#country-select").val($("#country-select").data(""));
+      return;
+    }
+
+    if (event.target.id === "country-select") {
+      $("#service-category-select").val($("#service-category-select").data(""));
+      $("#search-box").val($("#search-box").data(""));
+      return;
+    }
+    if (event.target.id === "service-category-select") {
+      $("#country-select").val($("#country-select").data(""));
+      //   document.querySelector("#search-box").value = "";
+      $("#search-box").val($("#search-box").data(""));
+      return
+    }
+
+    if (event.target.id === "clear-filter-container") {
+      $("#service-category-select").val($("#service-category-select").data(""));
+      $("#country-select").val($("#country-select").data(""));
+      $("#search-box").val($("#search-box").data(""));
+    }
+
+
+
+    const orgdata = await fetchOrgs(null, null);
+    listorg(orgdata)
+    initMap(orgdata.data);
+  }
+
+  async function fetchCategories() {
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+    };
+    const graphqlQuery = {
+      query: `query($locale:I18NLocaleCode){
+                categoryServices (locale:$locale){
+    data {
+      id
+      attributes {
+        name
+        locale
+      }
+    }
+  }
+}`,
+      variables: {
+        "locale": "en"
+      }
+    };
+    const options = {
+      "method": "POST",
+      "headers": headers,
+      "body": JSON.stringify(graphqlQuery)
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+
+    return data.data.categoryServices.data
+  }
+
+  function getCountryName(countryCode) {
+    var isoCountries = {
+      'AF': 'Afghanistan',
+      'AX': 'Aland Islands',
+      'AL': 'Albania',
+      'DZ': 'Algeria',
+      'AS': 'American Samoa',
+      'AD': 'Andorra',
+      'AO': 'Angola',
+      'AI': 'Anguilla',
+      'AQ': 'Antarctica',
+      'AG': 'Antigua And Barbuda',
+      'AR': 'Argentina',
+      'AM': 'Armenia',
+      'AW': 'Aruba',
+      'AU': 'Australia',
+      'AT': 'Austria',
+      'AZ': 'Azerbaijan',
+      'BS': 'Bahamas',
+      'BH': 'Bahrain',
+      'BD': 'Bangladesh',
+      'BB': 'Barbados',
+      'BY': 'Belarus',
+      'BE': 'Belgium',
+      'BZ': 'Belize',
+      'BJ': 'Benin',
+      'BM': 'Bermuda',
+      'BT': 'Bhutan',
+      'BO': 'Bolivia',
+      'BA': 'Bosnia And Herzegovina',
+      'BW': 'Botswana',
+      'BV': 'Bouvet Island',
+      'BR': 'Brazil',
+      'IO': 'British Indian Ocean Territory',
+      'BN': 'Brunei Darussalam',
+      'BG': 'Bulgaria',
+      'BF': 'Burkina Faso',
+      'BI': 'Burundi',
+      'KH': 'Cambodia',
+      'CM': 'Cameroon',
+      'CA': 'Canada',
+      'CV': 'Cape Verde',
+      'KY': 'Cayman Islands',
+      'CF': 'Central African Republic',
+      'TD': 'Chad',
+      'CL': 'Chile',
+      'CN': 'China',
+      'CX': 'Christmas Island',
+      'CC': 'Cocos (Keeling) Islands',
+      'CO': 'Colombia',
+      'KM': 'Comoros',
+      'CG': 'Congo',
+      'CD': 'Congo, Democratic Republic',
+      'CK': 'Cook Islands',
+      'CR': 'Costa Rica',
+      'CI': 'Cote D\'Ivoire',
+      'HR': 'Croatia',
+      'CU': 'Cuba',
+      'CY': 'Cyprus',
+      'CZ': 'Czech Republic',
+      'DK': 'Denmark',
+      'DJ': 'Djibouti',
+      'DM': 'Dominica',
+      'DO': 'Dominican Republic',
+      'EC': 'Ecuador',
+      'EG': 'Egypt',
+      'SV': 'El Salvador',
+      'GQ': 'Equatorial Guinea',
+      'ER': 'Eritrea',
+      'EE': 'Estonia',
+      'ET': 'Ethiopia',
+      'FK': 'Falkland Islands (Malvinas)',
+      'FO': 'Faroe Islands',
+      'FJ': 'Fiji',
+      'FI': 'Finland',
+      'FR': 'France',
+      'GF': 'French Guiana',
+      'PF': 'French Polynesia',
+      'TF': 'French Southern Territories',
+      'GA': 'Gabon',
+      'GM': 'Gambia',
+      'GE': 'Georgia',
+      'DE': 'Germany',
+      'GH': 'Ghana',
+      'GI': 'Gibraltar',
+      'GR': 'Greece',
+      'GL': 'Greenland',
+      'GD': 'Grenada',
+      'GP': 'Guadeloupe',
+      'GU': 'Guam',
+      'GT': 'Guatemala',
+      'GG': 'Guernsey',
+      'GN': 'Guinea',
+      'GW': 'Guinea-Bissau',
+      'GY': 'Guyana',
+      'HT': 'Haiti',
+      'HM': 'Heard Island & Mcdonald Islands',
+      'VA': 'Holy See (Vatican City State)',
+      'HN': 'Honduras',
+      'HK': 'Hong Kong',
+      'HU': 'Hungary',
+      'IS': 'Iceland',
+      'IN': 'India',
+      'ID': 'Indonesia',
+      'IR': 'Iran, Islamic Republic Of',
+      'IQ': 'Iraq',
+      'IE': 'Ireland',
+      'IM': 'Isle Of Man',
+      'IL': 'Israel',
+      'IT': 'Italy',
+      'JM': 'Jamaica',
+      'JP': 'Japan',
+      'JE': 'Jersey',
+      'JO': 'Jordan',
+      'KZ': 'Kazakhstan',
+      'KE': 'Kenya',
+      'KI': 'Kiribati',
+      'KR': 'Korea',
+      'KW': 'Kuwait',
+      'KG': 'Kyrgyzstan',
+      'LA': 'Lao People\'s Democratic Republic',
+      'LV': 'Latvia',
+      'LB': 'Lebanon',
+      'LS': 'Lesotho',
+      'LR': 'Liberia',
+      'LY': 'Libyan Arab Jamahiriya',
+      'LI': 'Liechtenstein',
+      'LT': 'Lithuania',
+      'LU': 'Luxembourg',
+      'MO': 'Macao',
+      'MK': 'Macedonia',
+      'MG': 'Madagascar',
+      'MW': 'Malawi',
+      'MY': 'Malaysia',
+      'MV': 'Maldives',
+      'ML': 'Mali',
+      'MT': 'Malta',
+      'MH': 'Marshall Islands',
+      'MQ': 'Martinique',
+      'MR': 'Mauritania',
+      'MU': 'Mauritius',
+      'YT': 'Mayotte',
+      'MX': 'Mexico',
+      'FM': 'Micronesia, Federated States Of',
+      'MD': 'Moldova',
+      'MC': 'Monaco',
+      'MN': 'Mongolia',
+      'ME': 'Montenegro',
+      'MS': 'Montserrat',
+      'MA': 'Morocco',
+      'MZ': 'Mozambique',
+      'MM': 'Myanmar',
+      'NA': 'Namibia',
+      'NR': 'Nauru',
+      'NP': 'Nepal',
+      'NL': 'Netherlands',
+      'AN': 'Netherlands Antilles',
+      'NC': 'New Caledonia',
+      'NZ': 'New Zealand',
+      'NI': 'Nicaragua',
+      'NE': 'Niger',
+      'NG': 'Nigeria',
+      'NU': 'Niue',
+      'NF': 'Norfolk Island',
+      'MP': 'Northern Mariana Islands',
+      'NO': 'Norway',
+      'OM': 'Oman',
+      'PK': 'Pakistan',
+      'PW': 'Palau',
+      'PS': 'Palestinian Territory, Occupied',
+      'PA': 'Panama',
+      'PG': 'Papua New Guinea',
+      'PY': 'Paraguay',
+      'PE': 'Peru',
+      'PH': 'Philippines',
+      'PN': 'Pitcairn',
+      'PL': 'Poland',
+      'PT': 'Portugal',
+      'PR': 'Puerto Rico',
+      'QA': 'Qatar',
+      'RE': 'Reunion',
+      'RO': 'Romania',
+      'RU': 'Russian Federation',
+      'RW': 'Rwanda',
+      'BL': 'Saint Barthelemy',
+      'SH': 'Saint Helena',
+      'KN': 'Saint Kitts And Nevis',
+      'LC': 'Saint Lucia',
+      'MF': 'Saint Martin',
+      'PM': 'Saint Pierre And Miquelon',
+      'VC': 'Saint Vincent And Grenadines',
+      'WS': 'Samoa',
+      'SM': 'San Marino',
+      'ST': 'Sao Tome And Principe',
+      'SA': 'Saudi Arabia',
+      'SN': 'Senegal',
+      'RS': 'Serbia',
+      'SC': 'Seychelles',
+      'SL': 'Sierra Leone',
+      'SG': 'Singapore',
+      'SK': 'Slovakia',
+      'SI': 'Slovenia',
+      'SB': 'Solomon Islands',
+      'SO': 'Somalia',
+      'ZA': 'South Africa',
+      'GS': 'South Georgia And Sandwich Isl.',
+      'ES': 'Spain',
+      'LK': 'Sri Lanka',
+      'SD': 'Sudan',
+      'SR': 'Suriname',
+      'SJ': 'Svalbard And Jan Mayen',
+      'SZ': 'Swaziland',
+      'SE': 'Sweden',
+      'CH': 'Switzerland',
+      'SY': 'Syrian Arab Republic',
+      'TW': 'Taiwan',
+      'TJ': 'Tajikistan',
+      'TZ': 'Tanzania',
+      'TH': 'Thailand',
+      'TL': 'Timor-Leste',
+      'TG': 'Togo',
+      'TK': 'Tokelau',
+      'TO': 'Tonga',
+      'TT': 'Trinidad And Tobago',
+      'TN': 'Tunisia',
+      'TR': 'Turkey',
+      'TM': 'Turkmenistan',
+      'TC': 'Turks And Caicos Islands',
+      'TV': 'Tuvalu',
+      'UG': 'Uganda',
+      'UA': 'Ukraine',
+      'AE': 'United Arab Emirates',
+      'GB': 'United Kingdom',
+      'US': 'United States',
+      'UM': 'United States Outlying Islands',
+      'UY': 'Uruguay',
+      'UZ': 'Uzbekistan',
+      'VU': 'Vanuatu',
+      'VE': 'Venezuela',
+      'VN': 'Viet Nam',
+      'VG': 'Virgin Islands, British',
+      'VI': 'Virgin Islands, U.S.',
+      'WF': 'Wallis And Futuna',
+      'EH': 'Western Sahara',
+      'YE': 'Yemen',
+      'ZM': 'Zambia',
+      'ZW': 'Zimbabwe'
+    };
+    if (isoCountries.hasOwnProperty(countryCode)) {
+      return isoCountries[countryCode];
+    } else {
+      return countryCode;
+    }
+  }
+
+
+  function setCategoryColor(category_services) {
+    //console.log(category_services,"nameeeeeeeeeeeeeeee")
+    //var categories = category_services.trim();
+
+    //console.log(categories, "categoriessssssssssssss");
+    switch (category_services) {
+      case 'Health services':
+        return '#59F5B4';
+        break;
+      case 'Homecare services':
+        return '#EF7B3D';
+        break;
+      case 'Leisure activities':
+        return '#F7F625';
+        break;
+
+      case 'Social services':
+        return '#F7CD25';
+        break;
+      case 'Delivery shops & pharmacies':
+        return '#9370db';
+        break;
+      case 'Volunteers organisations':
+        return '#A860F4';
+        break;
+      default:
+        return '#ffa500';
+    }
+  }
+</script>

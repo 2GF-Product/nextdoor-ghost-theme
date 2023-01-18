@@ -1,0 +1,524 @@
+{{!
+< default-de}} {{#contentFor "preload" }} <link rel="preload" href="{{asset "css/listing.css"}}" as="style" />
+{{/contentFor}}
+
+{{!-- This block loads specific styles for the authors page --}}
+{{#contentFor "styles"}}
+<link rel="stylesheet" type="text/css" href="{{asset "css/listing.css"}}" media="screen" />
+{{/contentFor}}
+
+{{#contentFor "styles"}}
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+{{/contentFor}}
+
+
+<style>
+  .container .Swiper {
+    width: 100%;
+    height: 100%;
+
+  }
+
+  .container .swiper-slide {
+    position: relative;
+    text-align: start;
+    font-size: 12px;
+    background: #FFFFFF;
+
+    box-shadow: 0px 6px 6px rgba(48, 45, 45, 0.25);
+  }
+
+  /*    .container .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    } */
+
+  .container .swiper-slide .card-description {
+    padding: 1rem 1rem;
+
+  }
+
+  .container .swiper-slide .card-title,
+  .container .swiper-slide .card-text {
+    margin-bottom: .5rem;
+  }
+
+  .container .swiper-slide .card-data {
+    color: red;
+  }
+
+  .container .swiper-slide .card-title {
+    color: #000;
+
+  }
+
+  .container .swiper-slide .card-text {
+    color: grey;
+  }
+
+  .container .swiper-button-next {
+    color: #FFD700;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.15);
+
+    border-radius: 50%;
+  }
+
+  .container .swiper-button-prev {
+    color: #FFD700;
+    left: 26px !important;
+    color: #FFD700;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.1);
+
+    border-radius: 50%;
+  }
+</style>
+{{!-- leaflet map --}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+{{!-- leaflet map --}}
+
+
+
+<main class="main-wrap">
+
+  <div class=" org-detail">
+
+
+
+
+  </div>
+
+
+</main>
+
+
+<div class="container mb-5">
+  <div class="row justify-content-center">
+    <div class="col-8 ">
+      <h1 class="text-center">{{t "Standort"}}</h1>
+
+      <div class="w-100" id="location" style="height: 400px;"></div>
+    </div>
+  </div>
+</div>
+
+<section style=" background-color: #FFFFFF;">
+
+
+  <div class="container py-4 px-5 ">
+    <div class="row  justify-content-center event-wrap">
+      <h2 class=" text-dark ps-0 ">{{t "Veranstaltungen"}}</h2>
+      <div class="  swiper mySwiper text-center">
+        <div class="swiper-wrapper   event-container ">
+
+
+
+        </div>
+
+        <div class="swiper-button-next "></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+      <div class="text-center py-5">
+        <a href="/event/">
+          {{!-- <button class="btn btn-warning btn-lg rounded-pill">
+            See more
+          </button> --}}
+          <button type="button" class="btn  pill " style="background-color: #FFD700;">{{t "Alle
+            Veranstaltungen"}}</button>
+        </a>
+      </div>
+
+
+    </div>
+  </div>
+</section>
+
+<!-- Swiper  carocel event-->
+
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+
+  var swiper = new Swiper('.mySwiper', {
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    },
+    slidesPerView: 1,
+    spaceBetween: 10,
+    // init: false,
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true
+    },
+
+    breakpoints: {
+      620: {
+        slidesPerView: 1,
+        spaceBetween: 20
+      },
+      680: {
+        slidesPerView: 2,
+        spaceBetween: 40
+      },
+      920: {
+        slidesPerView: 3,
+        spaceBetween: 40
+      },
+      1240: {
+        slidesPerView: 4,
+        spaceBetween: 50
+      }
+    }
+    // eslint-disable-next-line indent
+  });
+
+</script>
+
+
+
+<script>
+
+  (
+    async function () {
+      await getOrgId()
+      //drawMap()
+      await fetchEvent();
+    }
+  )()
+  let country = null
+
+
+  async function drawMap(org) {
+
+
+
+
+    var location = org.attributes.location;
+
+    var locationData = location.data.attributes.geolocation
+
+    var map = L.map('location').setView([locationData.latitude, locationData.longitude], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    })
+      .addTo(map);
+    L.marker([locationData.latitude, locationData.longitude]).addTo(map)
+      .bindPopup(`<center><img src= "${org.attributes.logotipo.data.attributes.url}"
+        style="width:50%; height:50%" class=""> </center>`+ '<br/>'
+        + '<b>' + org?.attributes?.name + '</b>'
+        + '<br/> ' + org?.attributes?.address
+        + '<br/> ' + `${org?.attributes?.telephone ? '<i class="bi bi-telephone-fill"></i> ' + org?.attributes?.telephone : ""}`
+        + '<br/> ' + `${org?.attributes?.link ? '<i class="bi bi-globe"></i> ' + '<a target=_blank href=' + '"' + org?.attributes?.link + ' ">Website</a>' : ""}`
+        + '<br/> ' + '<ul>' + org?.attributes?.services?.data.map((service) => {
+          //console.log(service?.attributes?.name, "service");
+          return `${service?.attributes?.name ? '<li>' + service?.attributes?.name + '</li>' : ''}`
+
+
+        }).join("") + '</ul>')
+      .openPopup();
+
+
+
+
+  }
+
+
+  async function listDetail(org) {
+    const eventtime = document.querySelector(".evenTime")
+    const mainWrap = document.querySelector(".org-detail")
+
+    if (org) {
+      //console.log("inside if");
+      const logo = org?.attributes?.logotipo?.data?.attributes?.url ? org?.attributes?.logotipo?.data?.attributes?.url : "https://via.placeholder.com/300x300";
+      const name = org?.attributes?.name ? org?.attributes?.name : "";
+      const description = org?.attributes?.description ? org?.attributes?.description : "";
+      const organisationAddress = org?.attributes?.address;
+      const infoAcessibility = org?.attributes?.infoAcessibility;
+      const recomendationAcess = org.attributes.recomendationAcess ? org.attributes.recomendationAcess : null;
+      const telephone = org.attributes.telephone ? org.attributes.telephone : null;
+      const link = org.attributes.link ? org.attributes.link : null;
+      country = org.attributes?.location.data?.attributes?.country;
+      //console.log(country, "country");
+      //console.log(org, infoAcessibility, recomendationAcess , link)
+
+      mainWrap.innerHTML = ` 
+                <section class="m-hero no-picture" data-aos="fade">
+  
+
+
+      <div class="m-hero__content" data-aos="fade-down">
+      <div class="m-hero-avatar" style="background-image:url(${logo});"></div>
+        <h1 class="m-hero-title ">${name}</h1>
+ 
+        <p class="m-hero-description">${description}</p>
+             <div>
+        
+     
+                                 <br/> <p><strong>{{t "Anschrift"}}: </strong>${organisationAddress}</p>
+                              </div>
+                              <br>
+                              <div>
+                                ${(infoAcessibility || recomendationAcess || link || telephone)
+          ?
+          `   ${recomendationAcess ? `<p><strong>{{t "Informationen zur Barrierefreiheit"}}:</strong> ${recomendationAcess}</p>` : ``}
+                                  ${infoAcessibility ? `<p><strong>{{t "Informationen zur Zugänglichkeit"}}:</strong> ${infoAcessibility}</p>` : ``}
+                                  ${telephone ? `<p><strong>{{t "Kontakt"}}:</strong> ${telephone}</p>` : ``}
+                                  ${link ? `<p><strong>{{t "Link"}}:</strong> <a href='${link}'>${link}</a></p>` : ``}
+                                  `
+          : ``}   
+                              </div>
+         <div class="m-hero__meta mt-4"> 
+          <ul class="m-hero-social">
+            <li>
+              <a href="${link ? link : ``}" target="_blank" rel="noopener" aria-label="{{t "Website"}}">
+                <span class="icon-globe" style="font-size: 1.3rem;"></span>
+              </a>
+            </li>
+          </ul>
+       
+
+       
+         </div>
+      </div>
+    </section>`
+
+    } else {
+      mainWrap.innerHTML = ` <div class="container-fluid  p-0">{{t "Keine Daten gefunden"}}</div>`
+    }
+
+  }
+
+
+  async function clickToDetail(eventid) {
+
+    window.location.href = "{{@site.url}}/event-detail?eventid=" + eventid;
+  }
+
+  async function getOrgId() {
+
+
+
+    var currentUrl = window.location.href;
+    let paramaters = (new URL(currentUrl)).searchParams;
+    var id = paramaters.get("orgId");
+
+
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+
+    };
+    const graphqlQuery = {
+
+
+
+      query: `query {
+                  organizations(filters:{id:{eq:"${id}"}}) {
+                    data {
+                      id
+                      attributes {
+                        name
+                        description
+                        address
+                        telephone
+                        recomendationAcess
+                        infoAcessibility
+                        link
+                      }
+                      attributes{
+                        logotipo{
+                          data{
+                            attributes{
+                              url
+                            }
+                          }
+                        }
+                      }
+                      attributes {
+                        location {
+                          data {
+                            id
+                            attributes {
+                              country
+                              City
+                              geolocation
+                            }
+                          }
+                        }
+                      }
+                        attributes {
+                        services {
+                          data {
+                            id
+                            attributes {
+                              name
+                              description
+                            }
+                          }
+                        }
+                      }
+                      
+                    }
+                  
+                  }
+                }
+             `,
+      variables: { id: id }
+
+    };
+
+    const options = {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(graphqlQuery)
+
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+    //console.log(data.data?.organizations?.data[0], "org");
+    listDetail(data.data?.organizations?.data[0]);
+    drawMap(data.data?.organizations?.data[0])
+
+  }
+
+  async function fetchEvent() {
+    //let eventData = [];
+    let url;
+    const eventCover = document.querySelector(".card-img-top")
+    const eventDate = document.querySelector(".card-text")
+    const eventContainer = document.querySelector(".event-container")
+
+    // const eventLocation = document.querySelector("") 
+
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+
+    };
+    const graphqlQuery = {
+      //"operationName": "fetchEvent",
+      "query": `query($country: String) {
+                  events(filters: { location: { country: { eq: $country } } }) {
+                    data {
+                      id
+                      attributes {
+                        type
+                        name
+                        description
+                        startDate
+                        endDate
+                      }
+                      attributes {
+                        location {
+                          data {
+                            attributes {
+                              country
+                              City
+                              geolocation
+                            }
+                          }
+                        }
+                      }
+                      attributes {
+                        cover {
+                          data {
+                            id
+                            attributes {
+                              url
+                            }
+                          }
+                        }
+                      }
+                      attributes {
+                        organization {
+                          data {
+                            id
+                            attributes {
+                              name
+                              address
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `,
+      "variables": { "country": `${country}` }
+    };
+    const options = {
+      "method": "POST",
+      "headers": headers,
+      "body": JSON.stringify(graphqlQuery)
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+
+    const eventList = data.data.events?.data.map(({ id, attributes }) => {
+      var id = id;
+      var name = attributes.name;
+      var description = attributes.description;
+      var startDate = attributes.startDate;
+      var endDate = attributes.endDate;
+      var cover = attributes.cover.data?.attributes.url;
+      var colorEventType = attributes.type == "InPerson" ? "#FFD700" : "#102A3F";
+
+
+      return `  <div class="swiper-slide">
+                    <a onclick="clickToDetail(${id})">
+                        <div class="col">
+                            <div class="card rounded-3  card-event-home   ">
+                                <img src=${cover ? cover : "https://res.cloudinary.com/dgzcqchec/image/upload/v1645806975/publication_cover_b221666e81.jpg"} class="card-img-top" width="20" height="" alt="..."
+                                    style=" min-height: 10rem;max-height:" ;>
+                                <div class="card-body">
+
+
+                                    <h5 class="card-title text-limit"> ${attributes.name}</h5>
+                                    <p class="card-text text-limit "> ${attributes.description}</p>
+                                    <p class="card-text text-limit "> 
+                                      ${new Date(attributes.startDate).toLocaleDateString("en-uk")} 
+                                      ${attributes.endDate ? ` | ${new Date(attributes.endDate).toLocaleDateString("en-uk")} ` : ""}</p>
+                                    <p class="card-text text-limit"><small
+                                                class="badge rounded-pill  " 
+                                                  style="background-color: ${colorEventType};">${attributes.type}</small>
+                                        </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>`;
+    }).join("");
+
+
+
+    if (eventList.length > 0) {
+      eventContainer.innerHTML = eventList
+    } else {
+      eventContainer.innerHTML = `<div class="container">
+                                        <div class="row justify-content-center">
+                                          <h3>{{t "Keine Veranstaltungen gefunden"}}</h3>
+                                          <p>
+                                            {{t "Apparently there are no events at the moment, check again later."}}
+                                          </p>
+                                        </div>
+                                        
+                                      </div>`;
+    }
+
+  }
+
+</script>

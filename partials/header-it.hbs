@@ -1,0 +1,115 @@
+<script>
+  (
+    function () {
+      const navItems = document.querySelectorAll('.nav-link');
+      for (let i = 0; i < navItems.length; i++) {
+        const path = navItems[i].attributes.href.value.split("/").at(-2)
+        const location = window.location.pathname.split("/").at(-2)
+
+        if (location === path) {
+          navItems[i].classList.add('active');
+        }
+      }
+    }
+  )()
+
+</script>
+<style>
+  .item {
+
+    line-height: 1.5em;
+    padding: .5rem;
+  }
+
+  .item img {
+    margin-right: 1rem;
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg  navbar-light bg-white  fixed-top custom-navbar mb-2  " id="header">
+  <div class="container">
+    <a href="{{@site.url}}/it" class="navbar-brand" style="display: flex;">
+      {{#if @site.logo}}
+      <img class="d-inline-block align-top" src="{{@site.logo}}" alt="{{@site.title}}" height="20" />
+      {{else}}
+      {{@site.title}}
+      {{/if}}
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse pe-3 " id="navmenu" style="font-size: 14px;">
+      <ul class="navbar-nav ms-auto role=" menu" ">
+  <li class=" nav-item ">
+    <a href=" /it" class="   nav-link fw-bold fs-6 text-uppercase  {{#if current}} active{{/if}}">
+        Home</a>
+        </li>
+        <li class="nav-item ">
+          <a href="/it/map/" class="   nav-link fw-bold fs-6 text-uppercase {{#if current}}    active{{/if}}  ">{{t
+            "MAPPA DEI SERVIZI"}}</a>
+        </li>
+        <li class="nav-item ">
+          <a href="/it/event/" class="   nav-link fw-bold fs-6 text-uppercase  {{#if current}}    active{{/if}} ">{{t
+            "EVENTI"}}</a>
+        </li>
+        <li class="nav-item ">
+          <a href="/it/resources/"
+            class="   nav-link fw-bold fs-6 text-uppercase  {{#if current}}    active{{/if}} ">{{t "RISORSE"}}</a>
+        </li>
+
+        <li class="nav-item ">
+
+          <a href="/it/feedback/" class="nav-link fw-bold fs-6 text-uppercase {{#if current}}    active{{/if}}">
+            {{t "FEEDBACK"}}</a>
+        </li>
+
+        <li class="nav-item ">
+
+          <a href="http://app.nextdoor-project.org:8000/admin/auth/login"
+            class="   nav-link fw-bold fs-6 text-uppercase ">{{t "ACCEDERE"}}</a>
+        </li>
+        <li class="nav-item ">
+
+          <a href="/it/signup/" class="   nav-link fw-bold fs-6 text-uppercase ">{{t "ISCRIVITI"}}</a>
+        </li>
+        <div class="dropdown">
+          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="true"><i class="bi bi-globe2"></i> IT
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li class="item">
+              <a href="{{@site.url}}/ro">
+                <img src="{{@site.url}}/assets/images/romania-flag.png" width="32" />Română</a>
+            </li>
+            <li class="item">
+              <a href="{{@site.url}}/pt">
+                <img src="{{@site.url}}/assets/images/portugal-flag.png" width="32" />Português</a>
+            </li>
+            <li class="item">
+              <a href="{{@site.url}}/es">
+                <img src="{{@site.url}}/assets/images/spain-flag.png" width="32" />Espanhol</a>
+            </li>
+            <li class="item">
+              <a href="{{@site.url}}/it">
+                <img src="{{@site.url}}/assets/images/italy-flag.png" width="32" />Italiano</a>
+            </li>
+            <li class="item">
+              <a href="{{@site.url}}/fr">
+                <img src="{{@site.url}}/assets/images/france-flag.png" width="32" />Français</a>
+            </li>
+            <li class="item">
+              <a href="{{@site.url}}/de">
+                <img src="{{@site.url}}/assets/images/germany-flag.png" width="32" />Deutsch</a>
+            </li>
+            <li class="item">
+              <a href="/">
+                <img src="{{@site.url}}/assets/images/uk-flag.png" width="32" />English</a>
+            </li>
+          </ul>
+
+        </div>
+    </div>
+</nav>

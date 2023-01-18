@@ -1,0 +1,284 @@
+{{!< default-pt}} {{#contentFor "styles" }} <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+{{/contentFor}}
+
+<style>
+  .container .Swiper {
+    width: 100%;
+    height: 100%;
+
+  }
+
+  .container .swiper-slide {
+    position: relative;
+    text-align: start;
+    font-size: 12px;
+    background: #FFFFFF;
+
+    box-shadow: 0px 6px 6px rgba(48, 45, 45, 0.25);
+  }
+
+  /*    .container .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    } */
+
+  .container .swiper-slide .card-description {
+    padding: 1rem 1rem;
+
+  }
+
+  .container .swiper-slide .card-title,
+  .container .swiper-slide .card-text {
+    margin-bottom: .5rem;
+  }
+
+  .container .swiper-slide .card-data {
+    color: red;
+  }
+
+  .container .swiper-slide .card-title {
+    color: #000;
+
+  }
+
+  .container .swiper-slide .card-text {
+    color: grey;
+  }
+
+  .container .swiper-button-next {
+    color: #FFD700;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.15);
+
+    border-radius: 50%;
+  }
+
+  .container .swiper-button-prev {
+    color: #FFD700;
+    left: 26px !important;
+    color: #FFD700;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.1);
+
+    border-radius: 50%;
+  }
+</style>
+
+
+
+
+{{> header-pt}}
+
+<main>
+  {{!-- Inject the carousel --}}
+  {{> caroucel-pt}}
+  {{> presentation-pt}}
+  {{> todo-section-pt}}
+
+
+  {{> event-caroucel-pt}}
+  {{> partner-session-pt}}
+</main>
+
+
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+
+  var swiper = new Swiper('.mySwiper', {
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    },
+    slidesPerView: 1,
+    spaceBetween: 10,
+    // init: false,
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true
+    },
+
+    breakpoints: {
+      620: {
+        slidesPerView: 1,
+        spaceBetween: 20
+      },
+      680: {
+        slidesPerView: 2,
+        spaceBetween: 40
+      },
+      920: {
+        slidesPerView: 3,
+        spaceBetween: 40
+      },
+      1240: {
+        slidesPerView: 4,
+        spaceBetween: 50
+      }
+    }
+    // eslint-disable-next-line indent
+  });
+
+</script>
+
+
+<script>
+
+
+
+
+
+  (async function fetchEvent() {
+    await displayLoading();
+    let eventData = [];
+    let url;
+    const eventCover = document.querySelector(".card-img-top")
+    const eventDate = document.querySelector(".card-text")
+    const eventContainer = document.querySelector(".event-container")
+
+    // const eventLocation = document.querySelector("") 
+
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+
+    };
+    const graphqlQuery = {
+      //"operationName": "fetchEvent",
+      "query": `query {
+    events {
+        data {
+            id
+            attributes {
+            type
+            name
+            description
+            startDate
+            endDate
+            }
+            attributes{
+              location{
+                data{
+                  attributes{
+                    country
+                    City
+                    geolocation
+                  }
+                }
+              }
+            }
+            attributes{
+            cover{
+                data{
+                id
+                attributes{
+                    url
+                }
+                }
+            }
+            }
+            attributes {
+            organization {
+                data {
+                id
+                attributes {
+                    name
+                    address
+                }
+                }
+            }
+            }
+        }
+    }
+}
+
+`,
+      "variables": {}
+    };
+    const options = {
+      "method": "POST",
+      "headers": headers,
+      "body": JSON.stringify(graphqlQuery)
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+    //console.log(data.data, "my data"); // data
+    //console.log(data.errors, " my error"); // errors
+    //console.log(data.data.events, "event data");
+    const eventList = data.data.events?.data.map(({ id, attributes }) => {
+      var id = id;
+      var name = attributes.name;
+      var description = attributes.description;
+      var startDate = attributes.startDate;
+      var endDate = attributes.endDate;
+      var cover = attributes.cover.data?.attributes.url;
+
+      var colorEventType = attributes.type == "InPerson" ? "#FFD700" : "#102A3F";
+      var colorText = attributes.type == "InPerson" ? "#5c5c5c" : "#ffffff";
+      //console.log(colorEventType ,"my type");
+
+      return `  <div class="swiper-slide">
+               <a onclick="clickToDetail(${id})" >
+                   <div class="col">
+                        <div class="card rounded-3 card-event">
+                            <img src=${cover ? cover : "https://res.cloudinary.com/dgzcqchec/image/upload/v1645806975/publication_cover_b221666e81.jpg"} class="card-img-top" width="20" height="" alt="..." class="card-img-top" width="20" height="" alt="..." style=" min-height: 10rem;max-height:";>
+                            <div class="card-body">
+                                <h5 class="card-title text-limit" style="color: #4A4A4A;"> ${attributes.name}</h5>
+                                <p class="card-text text-limit " style="color: #4A4A4A;"> ${attributes.description}</p>
+                                <p class="card-text text-limit "style="color: #4A4A4A;">
+                                  ${new Date(attributes.startDate).toLocaleDateString("en-uk")}
+                                  ${attributes.endDate ? ` | ${new Date(attributes.endDate).toLocaleDateString("en-uk")} ` : ""}</p>
+                                <p class="card-text text-limit"><small
+                                            class="badge rounded-pill"
+                                              style="background-color: ${colorEventType}; color:${colorText};" >${attributes.type}</small>
+                                    </p>
+                            </div>
+                        </div>
+                     </div> </a>
+                </div>`;
+    }).join("");
+
+    eventContainer.innerHTML = eventList;
+
+
+
+  })()
+
+  async function clickToDetail(eventid) {
+    //var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+
+    //console.log(eventid, "eventid");
+    // window.location.replace(`http://localhost:2368/event-detail?eventId=${encodeURI(JSON.stringify(event))}`);
+    // const url = `/event-detail?event=?query=${encodeURI(JSON.stringify(event))}`;
+    window.location.href = "{{@site.url}}/event-detail?eventid=" + eventid;
+  }
+
+
+
+  async function displayLoading() {
+
+    const eventContainer = document.querySelector(".event-container")
+    eventContainer.innerHTML =
+      `
+                                        <div class="mx-auto">
+                                          <div class="spinner-border" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                          </div>
+                                        </div>
+                                       
+                                      `;
+
+    const promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve()
+      }, 1000)
+    })
+    return promise
+  }
+</script>

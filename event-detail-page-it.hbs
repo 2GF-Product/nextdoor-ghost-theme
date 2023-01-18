@@ -1,0 +1,548 @@
+{{!
+< default-it}} {{#contentFor "preload" }} <link rel="preload" href="{{asset "css/listing.css"}}" as="style" />
+{{/contentFor}}
+
+{{!-- This block loads specific styles for the authors page --}}
+{{#contentFor "styles"}}
+<link rel="stylesheet" type="text/css" href="{{asset "css/listing.css"}}" media="screen" />
+{{/contentFor}}
+
+{{#contentFor "styles"}}
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+{{/contentFor}}
+
+{{!-- leaflet map --}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+
+<style>
+  .container .Swiper {
+    width: 100%;
+    height: 100%;
+
+  }
+
+  .container .swiper-slide {
+    position: relative;
+    text-align: start;
+    font-size: 12px;
+    background: #FFFFFF;
+
+    box-shadow: 0px 6px 6px rgba(48, 45, 45, 0.25);
+  }
+
+  /*    .container .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    } */
+
+  .container .swiper-slide .card-description {
+    padding: 1rem 1rem;
+
+  }
+
+  .container .swiper-slide .card-title,
+  .container .swiper-slide .card-text {
+    margin-bottom: .5rem;
+  }
+
+  .container .swiper-slide .card-data {
+    color: red;
+  }
+
+  .container .swiper-slide .card-title {
+    color: #000;
+
+  }
+
+  .container .swiper-slide .card-text {
+    color: grey;
+  }
+
+  .container .swiper-button-next {
+    color: #FFD700;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.15);
+
+    border-radius: 50%;
+  }
+
+  .container .swiper-button-prev {
+    color: #FFD700;
+    left: 26px !important;
+    color: #FFD700;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.1);
+
+    border-radius: 50%;
+  }
+</style>
+
+<main class="">
+
+  <div class="event-detail">
+
+
+
+  </div>
+
+</main>
+
+<div class="container mb-5">
+  <div class="row justify-content-center">
+    <div class="col-8 ">
+      <h1>{{t "Posizione"}}</h1>
+
+      <div class="w-100" id="location" style="height: 400px;"></div>
+    </div>
+  </div>
+</div>
+<section style=" background-color: #FFFFFF;">
+  <div class="container py-4 px-5 ">
+    <div class="row  justify-content-center event-wrap">
+      <h2 class=" text-dark ps-0 ">{{t "Eventi"}}</h2>
+      <div class="  swiper mySwiper text-center">
+        <div class="swiper-wrapper   event-container ">
+        </div>
+
+        <div class="swiper-button-next "></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+      <div class="text-center py-5">
+        <a href="/event/">
+          {{!-- <button class="btn btn-warning btn-lg rounded-pill">
+            See more
+          </button> --}}
+          <button type="button" class="btn  pill " style="background-color: #FFD700;">{{t "Vedi tutti"}}</button>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+<script>
+
+  var swiper = new Swiper('.mySwiper', {
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    },
+    slidesPerView: 1,
+    spaceBetween: 10,
+    // init: false,
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true
+    },
+
+    breakpoints: {
+      620: {
+        slidesPerView: 1,
+        spaceBetween: 20
+      },
+      680: {
+        slidesPerView: 2,
+        spaceBetween: 40
+      },
+      920: {
+        slidesPerView: 3,
+        spaceBetween: 40
+      },
+      1240: {
+        slidesPerView: 4,
+        spaceBetween: 50
+      }
+    }
+    // eslint-disable-next-line indent
+  });
+
+</script>
+
+<script>
+  (
+    async function () {
+      await getDetail()
+      drawMap()
+      await fetchEventList();
+    }
+  )()
+  let country = null
+  async function getDetail() {
+    const eventtime = document.querySelector(".evenTime")
+    const mainWrap = document.querySelector(".event-detail")
+
+    var currentUrl = window.location.href;
+    let paramaters = (new URL(currentUrl)).searchParams;
+    var eventId = paramaters.get("eventid");
+
+    var event = await getEventById(eventId);
+
+    //console.log(event[0], "event");
+    //console.log(name, "name");
+
+
+    if (event[0]) {
+      var cover = event[0].attributes.cover.data?.attributes.url;
+      //   var cover=event[0].attributes.cover.data?.length >= 1 ? event[0].attributes.cover.data[0].attributes.url : "https://via.placeholder.com/300x300";
+      var eventName = event[0]?.attributes?.name;
+      var startDate = event[0]?.attributes?.startDate;
+      var endDate = event[0].attributes?.endDate;
+      //const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      const options = {};
+      const startDateConverted = new Date(startDate).toLocaleDateString('en-uk', options);
+      const endDateConverted = endDate ? new Date(endDate).toLocaleDateString('en-uk', options) : "";
+
+      const description = event[0]?.attributes?.description;
+      country = event[0]?.attributes?.location.data?.attributes?.country;
+      const city = event[0]?.attributes?.location.data?.attributes?.City;
+      const organisationName = event[0]?.attributes?.organization.data?.attributes?.name;
+      const organisationAddress = event[0]?.attributes?.organization.data?.attributes?.address;
+      const recomendationAccess = event[0].attributes?.recomendationAccess;
+      const infoAcessibility = event[0].attributes?.infoAcessibility;
+      const eventLink = event[0].attributes?.link;
+
+      mainWrap.innerHTML = ` 
+                  <div class="hero-section">
+                  <img src="${cover ? cover : "https://res.cloudinary.com/dgzcqchec/image/upload/v1645806975/publication_cover_b221666e81.jpg"}" height="" alt="...""
+                    class=" img-fluid hero-img-top" alt="Responsive image">
+                  </div>
+                  <div class="container">
+                      <div class="row justify-content-center">
+                          <div class="col-8 ">
+                              <div>
+                                <div style="
+                                  display: flex;
+                                  align-items: end;
+                                  margin-top: 0;">
+                                  <h1 style="margin-bottom: 0;">${eventName}</h1>
+                                  <p style="margin-bottom: 5px;"> - Event Detail</p></div>
+                                  <div class="fs-3 d-flex">
+                                      <i class="bi bi-stopwatch"></i>
+                                      <h4 class="p-2 evenTime">${startDateConverted} ${endDateConverted.length > 0 ? `| ${endDateConverted}` : ``}</h4>
+                                  </div>
+                                  <div class="fs-4 d-flex ">
+                                      <i class="bi bi-map"></i>
+                                      <h4 class="p-2"> ${city} | ${country} </h4>
+                                  </div>
+                              </div>
+                              <br>
+
+                              <div>
+                                  <h2>{{t "Descrizione dell'evento"}}</h2>
+                                  <p>${description}</p>
+                              </div>
+                              <br>
+                              <div>
+                                  <h3>{{t "Organizzazione"}}</h3
+                                  ${organisationName ? ` <p><strong>{{t "Il nome"}} :</strong>${organisationName}</p>` : ""}
+                                 ${organisationAddress ? `<p><strong>{{t "Adress"}} :</strong>${organisationAddress}</p>` : ""}
+                              </div>
+                              <br>
+                              <div>
+                                ${(infoAcessibility || recomendationAccess || eventLink)
+          ?
+          `<h3>{{ t "Additional information"}}</h3>
+                                                ${eventLink ? `<li><strong>{{t "Collegamento"}}:</strong> <a href='${eventLink}'>${eventLink}</a></li>` : ``}
+                                                
+                                                ${infoAcessibility ? `<li><strong>Accessibility Information:</strong> ${infoAcessibility}</li>` : ``}
+                                                ${recomendationAccess ? `<li><strong>Access Information:</strong> ${recomendationAccess}</li>` : ``}
+                                                `
+          : ``}   
+                              </div>
+                          </div>
+                      </div>
+                  </div> `
+    } else {
+      mainWrap.innerHTML = ` <div class="container-fluid  p-0"></div>`
+    }
+
+  }
+
+  async function getEventById(id) {
+
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+    };
+    const graphqlQuery = {
+      //"operationName": "fetchEvent",
+      query: `query($id: ID!) {
+                events(filters: { id: { eq: $id } }) {
+                  data {
+                    id
+                    attributes {
+                      type
+                      name
+                      description
+                      startDate
+                      endDate
+                      recomendationAccess
+                      infoAcessibility
+                      link
+                    }
+                    attributes {
+                      location {
+                        data {
+                          attributes {
+                            country
+                            City
+                            geolocation
+                          }
+                        }
+                      }
+                    }
+                    attributes {
+                      cover {
+                        data {
+                          id
+                          attributes {
+                            url
+                          }
+                        }
+                      }
+                    }
+                 
+                    attributes {
+                      organization {
+                        data {
+                          id
+                          attributes {
+                            name
+                            address
+                            telephone
+                          }
+                            attributes{
+                      logotipo{
+                        data{
+                          attributes{url}
+                        }
+                      }
+                    }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              `,
+      variables: { id: id }
+
+    };
+
+    const options = {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(graphqlQuery)
+
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+
+    return data.data.events.data;
+  }
+
+
+  async function drawMap() {
+    var currentUrl = window.location.href;
+    let paramaters = (new URL(currentUrl)).searchParams;
+    var eventId = paramaters.get("eventid");
+
+    var event = await getEventById(eventId);
+    //  console.log(event, "event");
+    var location = event[0].attributes?.location;
+    var organization = event[0].attributes?.organization;
+    console.log(organization, "org");
+    var locationData = location?.data?.attributes?.geolocation
+    var map = L.map('location').setView([locationData?.latitude, locationData?.longitude], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    })
+      .addTo(map);
+    L.marker([locationData?.latitude, locationData?.longitude]).addTo(map)
+
+
+
+      /*  .bindPopup('<center>'+`${organization?.data?.attributes?.logotipo?.data?.attributes?.url ?
+      "<img src="+organization?.data?.attributes?.logotipo?.data?.attributes?.url +" style=width:50%; height:50%;>":""}`+
+ 
+       `</center>`+ '<br/>' + '<b>' +`${organization?.data?.attributes?.name ? organization?.data.attributes?.name : ""}`+ '</b><br /> '
+         + `${organization?.data.attributes?.address ? organization?.data.attributes?.address : ""}`
+         + '<br/>' + '<b>' +
+           `${organization?.data?.attributes?.phone ? 'Contact:'  + '<a href="tel:' + organization?.data?.attributes?.phone + '">' + organization?.data?.attributes?.phone + '</a>': "" }`)
+       .openPopup();*/
+
+      .bindPopup('<center>' + `${organization?.data?.attributes?.logotipo?.data?.attributes?.url ?
+        "<img src=" + organization?.data?.attributes?.logotipo?.data?.attributes?.url + " style=width:50%; height:50%;>" : ""}` +
+        `</center>` + '<br/>'
+        + '<b>' + `${organization?.data?.attributes?.name ? organization?.data?.attributes?.address : ""}` + '</b>'
+        + '<br/> ' + `${organization?.data?.attributes?.address ? organization?.data.attributes?.address : ""}`
+        + '<br/> ' + `${organization?.data?.attributes?.telephone ? '<i class="bi bi-telephone-fill"></i> ' + organization?.data?.attributes?.telephone : ""}`
+        + '<br/> ' + `${organization?.data?.attributes?.link ? '<i class="bi bi-globe"></i> ' + '<a target=_blank href=' + '"' + organization?.data?.attributes?.link + ' ">Website</a>' : ""}`
+        /* + '<br/> ' + '<ul>' + organization?.data?.attributes?.services?.data.map((service) => {
+           console.log(service?.attributes?.name, "service");
+         return   `${service?.attributes?.name ? '<li>' + service?.attributes?.name + '</li>' : ''}`
+           
+
+         }).join("") + '</ul>')*/
+      ).openPopup();
+
+
+
+  }
+
+  // ---------------------------- Fetch event list
+  async function fetchEventList() {
+    const eventCover = document.querySelector(".card-img-top")
+    const eventDate = document.querySelector(".card-text")
+    const eventContainer = document.querySelector(".event-container")
+
+    // const eventLocation = document.querySelector("") 
+
+    const endpoint = apibaseurl + "/graphql";
+    const headers = {
+      "content-type": "application/json",
+
+    };
+    const graphqlQuery = {
+      //"operationName": "fetchEvent",
+      "query": `query($country: String) {
+                  events(filters: { location: { country: { eq: $country } } }) {
+                    data {
+                      id
+                      attributes {
+                        type
+                        name
+                        description
+                        startDate
+                        endDate
+                      }
+                      attributes {
+                        location {
+                          data {
+                            attributes {
+                              country
+                              City
+                              geolocation
+                            }
+                          }
+                        }
+                      }
+                      attributes {
+                        cover {
+                          data {
+                            id
+                            attributes {
+                              url
+                            }
+                          }
+                        }
+                      }
+                      attributes {
+                        organization {
+                          data {
+                            id
+                            attributes {
+                              name
+                              address
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `,
+      "variables": { "country": `${country}` }
+    };
+    const options = {
+      "method": "POST",
+      "headers": headers,
+      "body": JSON.stringify(graphqlQuery)
+    };
+
+    const response = await fetch(endpoint, options);
+    const data = await response.json();
+    //console.log(data.data, "my data"); // data
+    //console.log(data.errors, " my error"); // errors
+    //console.log(data.data.events, "event data");
+    const eventList = data.data.events?.data.map(({ id, attributes }) => {
+      var id = id;
+      var name = attributes?.name;
+      var description = attributes?.description;
+      var startDate = attributes?.startDate;
+      var endDate = attributes?.endDate;
+      var cover = attributes?.cover?.data?.attributes?.url;
+      var colorEventType = attributes?.type == "InPerson" ? "#FFD700" : "#102A3F";
+
+      //console.log(cover, "cover");
+      //var cover = attributes.cover.data.attributes.url;
+      // var location = attributes.organization.data.attributes.address;
+      /* if (cover {
+        url = attributes.cover.data[0]?.attributes.url
+      } else {
+        url = "https://res.cloudinary.com/dgzcqchec/image/upload/v1645806975/publication_cover_b221666e81.jpg"
+      } */
+
+      return `  <div class="swiper-slide">
+                    <a onclick="clickToDetail(${id})">
+                        <div class="col">
+                            <div class="card rounded-3  card-event-home   ">
+                                <img src=${cover ? cover : "https://res.cloudinary.com/dgzcqchec/image/upload/v1645806975/publication_cover_b221666e81.jpg"} class="card-img-top" width="20" height="" alt="..."
+                                    style=" min-height: 10rem;max-height:" ;>
+                                <div class="card-body">
+
+
+                                    <h5 class="card-title text-limit"> ${attributes?.name}</h5>
+                                    <p class="card-text text-limit "> ${attributes?.description}</p>
+                                    <p class="card-text text-limit "> 
+                                      ${new Date(attributes?.startDate).toLocaleDateString("en-uk")} 
+                                      ${attributes?.endDate ? ` | ${new Date(attributes?.endDate).toLocaleDateString("en-uk")} ` : ""}</p>
+                                    <p class="card-text text-limit"><small
+                                                class="badge rounded-pill  " 
+                                                  style="background-color: ${colorEventType};">${attributes?.type}</small>
+                                        </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>`;
+    }).join("");
+
+    if (eventList.length > 0) {
+      eventContainer.innerHTML = eventList
+    } else {
+      eventContainer.innerHTML = `<div style="width: 100%;">
+                                        <div class="m-heading no-margin">
+                                          <h3>{{t "No events in the region"}}</h3>
+                                          <p>
+                                            {{t "Apparently there are no events at the moment, check again later."}}
+                                          </p>
+                                        </div>
+                                        <article class=" container pt-3" id="events-container-list">
+                                          <div class="row row-cols-1 row-cols-md-4 g-4 event-container">
+
+                                          </div>
+                                        </article>
+                                      </div>`;
+    }
+  }
+
+  async function clickToDetail(eventid) {
+    window.location.href = "{{@site.url}}/event-detail?eventid=" + eventid;
+  }
+
+</script>

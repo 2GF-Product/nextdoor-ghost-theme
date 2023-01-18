@@ -1,0 +1,85 @@
+/* *{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #eee;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+}
+
+.container {
+  width: 100%;
+  height: 10px 40px;
+} */
+.container .mySwiper{
+  width: 100%;
+  height: 100%;
+  background: #eee;
+}
+
+.container .swiper-slide {
+  position: relative;
+  text-align: start;
+  font-size: 12px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0px 6px 6px rgba(48, 45, 45, 0.25);
+}
+
+.container .swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.container .swiper-slide .card-description{
+  padding:1rem 1rem;
+
+}
+
+.container .swiper-slide .card-title, .swiper-slide .card-text{
+  margin-bottom: .5rem;
+}
+
+.container .swiper-slide .card-data{
+  color: red;
+}
+
+.container .swiper-slide .card-title{
+  color: #000;
+
+}
+
+.container .swiper-slide .card-text{
+  color: grey;
+}
+
+.container .swiper-button-next{
+  color: #FFD700;;
+  right: 26px !important;
+
+}
+
+.container .swiper-button-prev{
+  color: #FFD700;;
+  left: 26px !important;
+}
+
+
+
+

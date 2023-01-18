@@ -1,0 +1,67 @@
+{{!-- The tag below means: insert everything in this file
+into the {body} of the default.hbs template --}}
+{{!< default}}
+
+<style>
+.main-wrap {
+  object-fit: contain;
+}
+input[type="radio"]:checked{
+  box-shadow: none;
+  border-color:#FFD700;
+  background: #FFD700;
+}
+</style>
+
+
+ <main class="main-wrap l-content py-5">
+
+    <script type="text/javascript">
+        function myFunction() {
+            var x = document.getElementById("user_script");
+            var y = document.getElementById("org_script");
+       
+            if (x.style.display === "none" || y.style.display === "block") {
+                y.style.display = "none";
+                x.style.display = "block";
+            } else {
+                y.style.display = "block";
+                x.style.display = "none";
+            }
+        }
+    </script>
+
+
+               
+                <div>
+                    <div class="container">
+                    <div class="d-flex flex-row  mt-3 p-2 justify-content-start">
+
+                        <div class="x-2 p-2" id="">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="user_button"
+                                checked onclick="myFunction()">
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                {{t "From User"}}
+                            </label>
+                        </div>
+
+                        <div id="" class="x-2 p-2">
+                            <input class="form-check-input " type="radio" name="flexRadioDefault" id="org_button"
+                                oninput="myFunction()">
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                {{t "From Organisation"}}
+                            </label>
+                        </div>
+                    </div>
+                    </div>
+
+                    {{!-- content t --}}
+                    <div id="user_script" style="display: block;">
+                        <script type="text/javascript" src="https://form.jotform.com/jsform/220611478147050"></script>
+                    </div>
+                    <div id="org_script" style="display: none;">
+                        <script type="text/javascript" src="https://form.jotform.com/jsform/220611929689365"></script>
+                    </div>
+                    <div style="background-color: #f2f3fd;"><br /><br /><br /></div>
+                </div>
+     

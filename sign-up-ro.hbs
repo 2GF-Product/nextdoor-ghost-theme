@@ -1,0 +1,400 @@
+{{!< default-ro}} <style>
+  /*****singup*****/
+
+  input[type="checkbox"]:checked{
+  box-shadow: none;
+  border-color:#FFD700;
+  background: #FFD700;
+  }
+  textarea:focus, textarea.form-control:focus, button[type]:focus, input:focus, input[type]:focus{
+  border-color: #FFD700;
+  box-shadow: none;
+  outline: 0 none;
+  }
+
+  </style>
+
+
+  <main class=" ">
+    <div class="row">
+      {{!-- side image --}}
+      <div class="col-sm-8">
+        <img src="/assets/images/img_02.jpg" class="img-fluid"
+          style="height: 100%; object-fit:cover; object-position:center" alt="Next Door ">
+      </div>
+
+      {{!-- singup form --}}
+      <div class="container justify-content-center col-sm-4 pt-5  px-4">
+        <div class="text-center">
+          <H1>{{t "Creează-ți contul"}}</H1>
+          <p>{{t "Un administrator vă va examina înregistrarea țn termen de 6 zile lucrătoare"}}</p>
+        </div>
+        <br />
+        <div class="form-group ">
+          <input type="text" class="form-control" id="org-name" placeholder="{{t " Organizație"}}*">
+        </div>
+        <br />
+        <div class="form-group ">
+          <textarea class="form-control" id="description" rows="3" placeholder="{{t " Descriere scurta"}}*"></textarea>
+        </div>
+        <br />
+        <label class="form-label" for="input-img-file">{{t "Logo-ul organizației"}}*</label>
+        <div class="form-group">
+          <input type="file" class="form-control" id="input-img-file" />
+        </div>
+        {{!-- <div class="image-area mt-4"><img id="preview-img" src="#" alt=""
+            class="img-fluid rounded shadow-sm mx-auto d-block"></div> --}}
+        <br />
+        <div class="form-group justify-content-center">
+          <div id="categories">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="health-services">
+              <label class="form-check-label" for="exampleCheck1">{{t "Servicii de sanatate"}}</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="homecare-services">
+              <label class="form-check-label" for="exampleCheck1">{{t "Servicii de îngrijire la domiciliu"}}</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="leisure-activities">
+              <label class="form-check-label" for="exampleCheck1">{{t "Activități de agrement"}}</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="social-services">
+              <label class="form-check-label" for="exampleCheck1">{{t "Servicii sociale"}}</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="delivery-pharmacies">
+              <label class="form-check-label" for="exampleCheck1">{{t "Stores with delivery option and
+                pharmacies"}}</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="delivery-pharmacies">
+              <label class="form-check-label" for="exampleCheck1">{{t "Organizații de voluntari"}}</label>
+            </div>
+          </div>
+          <br />
+          <div class="form-group">
+            <div>
+              <select class="form-select" aria-label="Country select" id="country-select">
+                <option value="" selected>{{t "Alege locația"}}*</option>
+                <option value="Portugal">{{t "Portugalia"}}</option>
+                <option value="Italy">{{t "Italia"}}</option>
+                <option value="Spain">{{t "Spania"}}</option>
+                <option value="France">{{t "Franţa"}}</option>
+                <option value="Germany">{{t "Germania"}}</option>
+                <option value="Romania">{{t "România"}}</option>
+              </select>
+            </div>
+          </div>
+          <br />
+          <div class="form-group ">
+            <input type="text" class="form-control" id="Address" placeholder="{{t " Adresa"}}*">
+          </div>
+          <br />
+          <div class="form-group ">
+            <input type="phone" class="form-control" id="phone" placeholder="{{t " Telefon"}}*">
+          </div>
+          <br />
+          <div class="form-group ">
+            <input type="email" class="form-control" id="email" placeholder="{{t " E-mail"}}*">
+          </div>
+
+          <br />
+
+          <div class="form-group ">
+            <input type="text" class="form-control" id="person_name" placeholder="{{t " Numele persoanei de
+              contact"}}*">
+          </div>
+
+          <br />
+          <div class="form-group ">
+            <input type="email" class="form-control" id="person_email" placeholder="{{t " E-mailul persoanei de
+              contact"}}*">
+          </div>
+
+          <br />
+
+          <small>{{t "* - Câmpuri obligatorii"}}</small>
+          <br />
+          <br />
+          <div class="d-flex justify-content-center">
+            <button type="button" class=" btn rounded-pill btn-block font-weight-bold"
+              style="background-color: #FFD700;width: 100%;" onclick="handleSubmit(event)">{{t "ÎNSCRIE-TE"}}</button>
+          </div>
+
+          <div class="text-center mt-2">
+            <small><u><a href="http://app.nextdoor-project.org:8000/admin/auth/login">{{t "Ai deja un cont?
+                  Conectează-te"}}</a></u></small>
+          </div>
+          {{!-- <br /> --}}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Fail -->
+  <div class="modal fade" id="modal-fail" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+  </div>
+  <!-- Modal Fail -->
+  <!-- Modal Success-->
+  <div class="modal fade" id="modal-success" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="d-flex justify-content-center mt-4">
+          <i class="fa fa-check" style="font-size: 32px;color: green;"></i>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+          Information submited with success, an admin will review your registration within 6 business days.
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="button" class=" btn rounded-pill btn-block font-weight-bold"
+            style="background-color: #FFD700;width: 70%;" onclick="location.href='/'">CONTINUE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Success -->
+  <script type="text/javascript">
+    if (typeof jQuery == 'undefined') {
+      document.write('<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></' + 'script>');
+    }
+  </script>
+  <script>
+    (
+      async function main() {
+        let categoryList = await fetchCategories()
+        if (categoryList) {
+          updateContainerList(categoryList)
+        }
+      }
+    )()
+    const showError = (message) => {
+      const modalFail = document.getElementById('modal-fail')
+      modalFail.innerHTML = `<div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                                <div class="modal-content">
+                                  {{!-- <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div> --}}
+                                  <div class="d-flex justify-content-center mt-4">
+                                    <i class="fa fa-exclamation" style="font-size: 32px;color: red;"></i>
+                                  </div>
+                                  <div class="modal-body" style="text-align: center;">
+                                    ${message}
+                                  </div>
+
+                                </div>
+                              </div>`
+      //alert('')
+      $('#modal-fail').modal('show');
+    }
+
+    function updateContainerList(list) {
+      let categoriesContainer = document.getElementById('categories')
+      const categoryList = list.map(category => {
+        return `<div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="${category.id}" value="${category.id}">
+                  <label class="form-check-label" for="exampleCheck1">${category.attributes.name}</label>
+                </div>`
+      })
+
+      categoriesContainer.innerHTML = categoryList.join('')
+    }
+
+    async function fetchCategories() {
+      const endpoint = apibaseurl + "/graphql";
+      const headers = {
+        "content-type": "application/json",
+      };
+      const graphqlQuery = {
+        query: `query($locale:I18NLocaleCode){
+                  categoryServices (locale:$locale){
+                  data {
+                    id
+                    attributes {
+                      name
+                      locale
+                    }
+                  }
+                }
+              }`,
+        variables: {
+          "locale": "ro"
+        }
+      };
+      const options = {
+        "method": "POST",
+        "headers": headers,
+        "body": JSON.stringify(graphqlQuery)
+      };
+
+      const response = await fetch(endpoint, options);
+      const data = await response.json();
+
+      return data.data.categoryServices.data
+    }
+
+    async function handleSubmit(event) {
+
+      // get user inputs
+      const orgName = document.getElementById('org-name').value
+      const description = document.getElementById('description').value
+      const categories = document.querySelectorAll('input[type=checkbox]:checked')
+      const address = document.getElementById('Address').value
+      const phone = document.getElementById('phone').value
+      const email = document.getElementById('email').value
+      const image = document.getElementById('input-img-file')?.files[0]
+      const country = document.getElementById("country-select").value
+
+      // validate inputs
+      if (!orgName || !description || !categories || !address || !phone || !email || !image || !country
+      ) {
+        showError("Please fill in all fields")
+        return
+      }
+      // send to api
+      const data = { orgName, description, categories, address, phone, email, image, country }
+
+      const res = await submitForm(data)
+      // notification of sucess or error
+
+      if (res.data.createOrganization) {
+        //alert('Successfully submitted')
+        $('#modal-success').modal('show');
+      } else {
+        showError(`${'Error submitting form. Check all the fields: Error: ' + res.errors[0]?.message}`)
+        return
+      }
+    }
+
+    async function submitForm(organisationData) {
+      const endpoint = apibaseurl + "/graphql";
+      const headers = {
+        "content-type": "application/json",
+      };
+
+      const imgUploadResult = await uploadImage(organisationData.image)
+      if (imgUploadResult.hasError()) {
+        showError(imgUploadResult.error)
+        return
+      }
+      console.log("result", imgUploadResult.hasError(), imgUploadResult.error, imgUploadResult.id)
+      const graphqlQuery = {
+        query: `mutation CreateOrganisation(
+                  $name: String
+                  $description: String
+                  $address: String
+                  $category_services: [ID]
+                  $logotipo: ID
+                  $email: String
+                  $telephone: String
+                  $country: ENUM_ORGANIZATION_COUNTRY
+                ) {
+                  createOrganization(
+                    data: {
+                      name: $name
+                      description: $description
+                      address: $address
+                      category_services: $category_services
+                      logotipo: $logotipo
+                      email: $email
+                      telephone: $telephone
+                      country: $country
+                    }
+                  ) {
+                    data {
+                      id
+                      attributes {
+                        name
+                      }
+                    }
+                  }
+                }
+          `,
+        variables: {
+          name: organisationData.orgName,
+          description: organisationData.description,
+          address: organisationData.address,
+          category_services: mapCategoryIds(organisationData.categories),
+          logotipo: Number(imgUploadResult.id),
+          email: organisationData.email,
+          telephone: organisationData.phone,
+          country: organisationData.country
+        }
+      };
+
+      const options = {
+        "method": "POST",
+        "headers": headers,
+        "body": JSON.stringify(graphqlQuery)
+      };
+
+      const response = await fetch(endpoint, options);
+      const result = await response.json();
+
+      if (result.errors) {
+        showError(`${'Error submitting form. Check all the fields: Error: ' + result.errors[0]?.message}`)
+        return
+      }
+
+      return result
+    }
+
+    function mapCategoryIds(categories) {
+      const categoryIds = []
+      categories.forEach(category => {
+        categoryIds.push(Number(category.value))
+      })
+
+      return categoryIds
+    }
+
+    async function uploadImage(image) {
+      let error = ""
+      let id = null
+      console.log(image)
+      const endpoint = apibaseurl + "/graphql";
+      const headers = {
+        "content-type": "application/json",
+      };
+
+      var formdata = new FormData();
+      formdata.append("operations", "{\"query\":\"mutation SingleImageUpload($file: Upload!){upload(file: $file) {data{id}}}\"}");
+      formdata.append("map", "{\"0\":[\"variables.file\"]}");
+      formdata.append("0", image, image.name);
+
+      var requestOptions = {
+        method: 'POST',
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      try {
+        const response = await fetch(endpoint, requestOptions)
+        const result = await response.json()
+        if (result.errors) {
+          throw new Error(result.errors[0]?.message)
+        }
+        id = result.data.upload.data.id
+      } catch (e) {
+        error = e
+      }
+
+      /*.then(response => response.text())
+      .then(result => {
+        id = result.data.upload.data.id
+        console.log('req res', result)
+      })
+      .catch(error => {
+        error = error
+        console.log('error', error)
+      });
+      */
+      return { hasError: () => { error.length > 0 }, id, error }
+    }
+  </script>

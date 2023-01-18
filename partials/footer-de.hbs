@@ -1,0 +1,89 @@
+<footer class="bd-footer   ">
+  <hr class=" text-center mt-0 mb-0 " />
+  <div class="container py-5">
+    <div class="row justify-content-center ">
+      <div class="col-lg-12    mb-3">
+        <center>
+          <a class="d-inline-flex mb-2 link-dark text-decoration-none" href="{{@site.url}}" aria-label="Bootstrap">
+            <div class="">
+              {{#if @site.logo}}
+              <img class="d-inline-block align-top" src="{{@site.logo}}" alt="{{@site.title}}" height="30" />
+              {{else}}
+              {{@site.title}}
+              {{/if}}
+
+            </div>
+          </a>
+        </center>
+        <div class="mb-4 ms-md-4"  style="color:#1b4ea1;">
+          <p>
+           {{t "Diese Website wurde im Rahmen des Projekts "}}
+           "{{t "NEXT DOOR - Fostering neighbourhood participation to protect and care for older citizens"}}" 
+           {{t ", Grant Agreement no. 2020-1-FR01-KA204-080560,mit finanzieller Unterstützung der Europäischen Kommission durch das Erasmus+ Programm erstellt."}} 
+           {{t "Die Verantwortung für den Inhalt dieser Veröffentlichung trägt allein der Verfasser; die Europäische Kommission haftet daher nicht für die weitere Verwendung der darin enthaltenen Angaben."}}
+          </p>
+        </div>
+        <center>
+          <div class="mb-4 ms-md-4">
+
+            <a>
+              <img
+                src="https://res.cloudinary.com/dgzcqchec/image/upload/v1646299017/logosbeneficaireserasmusright_en_1_3b8604d4f0.jpg"
+                class="card-img" alt="eu-logo" style="width:auto;max-width:25%">
+            </a>
+          </div>
+          <div class="mb-4 ms-md-4">
+            <!-- Project Site -->
+            <a class="btn btn-primary btn-floating rounded-circle border-0 " style="background-color: #cccaca;"
+              href="http://www.nextdoor-project.org/" target="_blank" role="button">
+              <i class="fa fa-link"></i>
+            </a>
+            <!-- Facebook -->
+            <a class="btn btn-primary btn-floating rounded-circle border-0 " style="background-color: #3b5998;"
+              role="button" href="https://www.facebook.com/NextDoorProject2020  " target="_blank">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+
+            <!-- Twitter -->
+            {{!-- <a class="btn btn-primary btn-floating rounded-circle border-0 " style="background-color: #55acee;"
+              href="#!" role="button">
+              <i class="fab fa-twitter"></i>
+            </a> --}}
+
+            <!-- Instagram -->
+            <a class="btn btn-primary  btn-floating rounded-circle border-0 " style="background-color: #ac2bac;"
+              role="button" href="https://www.instagram.com/nextdoor.project/" target="_blank">
+              <i class="fab fa-instagram"></i>
+            </a>
+
+            <!-- Linkedin -->
+            {{!-- <a class="btn btn-primary btn-floating  rounded-circle border-0 " style="background-color: #0082ca;"
+              href="#!" role="button">
+              <i class="fab fa-linkedin-in"></i>
+            </a> --}}
+            </section>
+            <!-- Section: Social media -->
+          </div>
+      </div>
+      </center>
+
+      <!--Copyright-->
+      <div class="row ms-md-4 justify-content-center">
+        {{!--
+        <hr class=" text-center mb-0 " /> --}}
+        <div class=" py-3 text-center">
+          &copy;
+          2023 Next Door |
+          {{!-- <a target="_blank" href="" class="link-secondary text-decoration-none">
+            Terms
+          </a>
+          | --}}
+          <a href="/privacy" class="link-secondary text-decoration-none">
+            Privacy
+          </a>
+        </div>
+      </div>
+      <!--/.Copyright-->
+    </div>
+  </div>
+</footer>

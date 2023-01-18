@@ -1,0 +1,692 @@
+{{!-- The tag below means: insert everything in this file
+into the {body} of the default.hbs template --}}
+{{!< default-pt}} <main class="main-wrap l-content pt-5">
+  <style>
+    .page-item.active .page-link {
+      color: rgb(255 255 255);
+      background-color: #FFD700;
+      border-color: #FFD700;
+    }
+
+    a.page-link {
+      color: #404040;
+
+    }
+  </style>
+  <div class="container l-content pt-5">
+
+    <div class="md-25  text-muted">
+      <div class="md-25  text-muted">
+        <!--Search-->
+        <div class="container w-100">
+          <div class="d-grid col-6 mx-auto position-relative">
+
+            <input id="search-box" for="searchbox" class="form-control rounded-pill position-absolute" type="search"
+              placeholder="{{t " Pesquisa"}}">
+            <button onclick="onClickSearch(event)" id="search-button"
+              class="btn btn-warning rounded-pill position-absolute end-0" type="submit" value="Submit"><i
+                data-feather="search"></i>{{t "Pesquisa"}}</button>
+          </div>
+        </div>
+      </div>
+      <!--Find Events-->
+      <div class="Container pt-5 ">
+        <div class=" row  ">
+          <div class=" col-3 ">
+            <h5 class="ps-2">{{t "Encontrar eventos"}}</h5>
+          </div>
+
+          <div class=" col-9 d-flex justify-content-end flex-wrap ms-auto">
+            <div class="p-2 flex-fill "></div>
+            <div class="p-2 flex-fill ">
+              <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm" id="this-month-button"
+                onclick="onClickFilter(event)">
+                {{t "Este mês"}}
+                <i class="fas fa-calendar"></i>
+              </button>
+            </div>
+            <div class="p-2 flex-fill ">
+              <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm" id="this-week-button"
+                onclick="onClickFilter(event)">
+                {{t "Esta semana"}}
+                <i class="fas fa-calendar-day"></i>
+              </button>
+            </div>
+            <div class="p-2 flex-fill " id="country-select-container">
+              <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm">
+                <i class="fas fa-location-dot"></i>
+              </button>
+
+            </div>
+            <div class="p-2 flex-fill " id="event-type-select-container">
+              <select onchange="onChangeEventType(event)" class="form-select rounded-pill btn-sm"
+                aria-label="Event type select" id="event-type">
+                <option value="">{{t "Todos os tipos"}}</option>
+                <option value="Online">Online</option>
+                <option value="InPerson">Presencial</option>
+              </select>
+            </div>
+            <div class="p-2 flex-fill ">
+              <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm" id="clear-filter-container"
+                onclick="onClickFilter(event)">
+                {{t "Limpar"}}
+                <i class="fas fa-times"></i>
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--Eventos-->
+      <article class="container pt-3" id="events-container-list">
+        <div class="row row-cols-1 row-cols-md-4 g-4 event-container" id="event-container">
+
+        </div>
+      </article>
+      <div class="row mt-4">
+        <div class="col-12 d-flex justify-content-center">
+          <nav aria-label="Page navigation">
+            <div class="pagination align-items-center">
+            </div>
+          </nav>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </main>
+
+  <script type="text/javascript">
+    if (typeof jQuery == 'undefined') {
+      document.write('<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></' + 'script>');
+    }
+  </script>
+
+  <script>
+    let query = {
+      filter: null,
+      pagination: null,
+      variables: null,
+      parameters: null,
+      queryString: function () {
+        let input = (!this.filter && !this.pagination) ? `` : `(
+              ${this.filter ? this.filter : ``}
+              ${this.pagination ? this.pagination : ``}
+              )`;
+        let queryString =
+          `query${this.parameters ? `(${this.parameters})` : ``} {
+            events ${input} {`;
+        return queryString;
+      }
+    };
+    let queryFilter = null
+    let queryVars = null;
+    let page = 1;
+    let paginationPage = 1;
+
+    (async function () {
+      let url;
+      const eventCover = document.querySelector(".card-img-top")
+      const eventDate = document.querySelector(".card-text")
+      const eventContainer = document.querySelector(".event-container")
+      const countrySelectContainer = document.querySelector("#country-select-container")
+      const thisWeekButton = document.querySelector("#this-week-button")
+      const thisMonthButton = document.querySelector("#this-month-button")
+
+      // ----- Country Select
+      const localeListData = [
+        {
+          id: 0,
+          name: "Todos os Países",
+          value: ""
+        },
+        {
+          id: 1,
+          name: "Portugal",
+          value: "Portugal"
+        },
+        {
+          id: 2,
+          name: "Italy",
+          value: "Italy",
+        },
+        {
+          id: 3,
+          name: "Spain",
+          value: "Spain",
+        },
+        {
+          id: 4,
+          name: "France",
+          value: "France",
+        },
+        {
+          id: 5,
+          name: "Germany",
+          value: "Germany",
+        },
+
+        {
+          id: 24,
+          name: "România",
+          value: "Romania",
+        },
+      ]
+
+      const countrySelect = localeListData.map(locale => {
+        return `<option value="${locale.value}">${locale.name}</option>`
+      })
+
+      countrySelectContainer.innerHTML = `<select id="country-select" onchange="onChangeCountry(event)" class="form-select rounded-pill btn-sm" aria-label="country list select">${countrySelect.join("")}</select>`
+      // ----- Country Select
+
+      // const eventdata = await fetchEvents();
+      // updateEventList(eventdata)
+      reload()
+    })()
+
+    async function clickToDetail(eventid) {
+      window.location.href = "{{@site.url}}/pt/event-detail?eventid=" + eventid;
+    }
+
+    async function onClickFilter(event) {
+      const weekbutton = document.querySelector("#this-week-button")
+      const monthbutton = document.querySelector("#this-month-button")
+      const searchbox = document.querySelector("#search-box")
+      const curr = new Date; // get current date
+      let first
+      let last
+      let startDate
+      let endDate
+
+      if (event.target.id == "this-month-button") {
+        clearFilters(event)
+        event.target.classList.add("active")
+        weekbutton.classList.remove("active")
+        searchbox.value = ""
+        startDate = new Date(curr.getFullYear(), curr.getMonth(), 1)
+        endDate = new Date(curr.getFullYear(), curr.getMonth() + 1, 0);
+      } else if (event.target.id == "this-week-button") {
+        clearFilters(event)
+        event.target.classList.add("active")
+        monthbutton.classList.remove("active")
+        searchbox.value = ""
+        first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+        last = first + 6; // last day is the first day + 6
+        startDate = new Date(curr.setDate(first));
+        endDate = new Date(curr.setDate(last));
+      } else if (event.target.id == "clear-filter-container") {
+        await clearFilters(event)
+        queryFilter = null
+        queryVars = null
+        await reload()
+        //const events = await fetchEvents()
+        //updateEventList(events)
+        return
+      }
+
+      /*queryFilter = `query FilterByDate($startDate: DateTime, $endDate: DateTime){
+                                events (
+                                  filters:{
+                                  startDate:{lte:$endDate},
+                                  and:{startDate:{gte:$startDate}},
+                                  or:{
+                                    endDate:{lte:$endDate}, 
+                                    and:{endDate:{gte:$startDate}}
+                                  }
+                                }
+                                ) {
+                              `
+      queryVars = {
+        startDate: startDate,
+        endDate: endDate
+      }*/
+
+      query.parameters = `$startDate: DateTime, $endDate: DateTime`
+      query.filter = `filters:{
+                                startDate:{lte:$endDate},
+                                and:{startDate:{gte:$startDate}},
+                                or:{
+                                  endDate:{lte:$endDate}, 
+                                  and:{endDate:{gte:$startDate}}
+                                }
+                              }`
+      query.variables = {
+        startDate: startDate,
+        endDate: endDate
+      }
+
+      await reload()
+      //const eventdata = await fetchEvents(filterQuery, queryVars);
+      //updateEventList(eventdata)
+
+    }
+
+    async function onChangeCountry(event) {
+      clearFilters(event)
+      const country = event.target.value;
+      queryFilter = `query($country: String) {
+          events(
+            filters:{location:{country:{eq:$country}}}
+            pagination:{page: ${paginationPage}, pageSize:12}
+            ) {
+      `
+      queryVars = !country ? {} : {
+        "country": country
+      }
+
+      query.filter = `filters:{location:{country:{eq:$country}}}`
+      query.variables = !country ? {} : {
+        "country": country
+      }
+      query.parameters = `$country: String`
+      await reload()
+      //const eventData = await fetchEvents(countryFilterQuery, countryQueryVars);
+      //updateEventList(eventData)
+    }
+
+    async function onChangeEventType(event) {
+      clearFilters(event)
+      const type = event.target.value;
+      queryFilter = `query($type: String) {
+          events(
+            filters:{type:{contains:$type}}
+            pagination:{page: ${paginationPage}, pageSize:12}
+            ) {
+      `
+      queryVars = !type ? {} : {
+        "type": type
+      }
+      query.filter = `filters:{type:{contains:$type}}`
+      query.variables = !type ? {} : {
+        "type": type
+      }
+      query.parameters = `$type: String`
+      await reload()
+      //const eventData = await fetchEvents(eventTypeFilterQuery, queryVars);
+      //updateEventList(eventData)
+    }
+
+
+    async function clearFilters(event) {
+      // clear filters
+
+      const searchbox = document.querySelector("#search-box")
+      const weekbutton = document.querySelector("#this-week-button")
+      const monthbutton = document.querySelector("#this-month-button")
+      const countrieselect = document.querySelector("#country-select")
+      const eventTypeSelect = document.querySelector("#event-type")
+
+      if (!(event.target.id === "this-week-button")) {
+        weekbutton.classList.remove("active")
+      }
+      if (!(event.target.id === "this-week-button")) {
+        monthbutton.classList.remove("active")
+      }
+
+      searchbox.value = "";
+
+      if (!(event.target.id === "event-type")) {
+        $("#event-type").val($("#event-type").data(""));
+      }
+      if (!(event.target.id === "country-select")) {
+        $("#country-select").val($("#country-select").data(""));
+      }
+      // end clear filters
+    }
+
+    async function updateEventList(eventdata) {
+      // ----- Events List
+      const eventList = eventdata.data.events.data.map(({ id, attributes }) => {
+        var id = id;
+        var name = attributes.name;
+        var description = attributes.description;
+        var startDate = attributes.startDate;
+        var endDate = attributes.endDate;
+        var cover = attributes.cover.data?.attributes.url;
+
+        var colorEventType = attributes.type == "InPerson" ? "#FFD700" : "#102A3F";
+        var colorText = attributes.type == "InPerson" ? "#5c5c5c" : "#ffffff";
+        //var cover = attributes.cover.data.attributes.url;
+        // var location = attributes.organization.data.attributes.address;
+        attributes.type = attributes.type == "InPerson" ? "{{t 'InPerson'}}" : "{{t 'Online'}}";
+        if (attributes.cover.data?.length >= 1) {
+          url = attributes.cover.data[0]?.attributes.url
+        } else {
+          url = "https://res.cloudinary.com/dgzcqchec/image/upload/v1645806975/publication_cover_b221666e81.jpg"
+        }
+        return ` <a onclick="clickToDetail(${id})" > 
+                   <div class="col">
+                        <div class="card rounded-3 card-event">
+                            <img src=${cover ? cover : "https://res.cloudinary.com/dgzcqchec/image/upload/v1645806975/publication_cover_b221666e81.jpg"} class="card-img-top" width="20" height="" alt="..." class="card-img-top" width="20" height="" alt="..." style=" min-height: 10rem;max-height:";>
+                            <div class="card-body">
+        
+        
+                                <h5 class="card-title text-limit"> ${attributes.name}</h5>
+                                <p class="card-text text-limit "> ${attributes.description}</p>
+                                <p class="card-text text-limit "> 
+                                  ${new Date(attributes.startDate).toLocaleDateString("en-uk")} 
+                                  ${attributes.endDate ? ` | ${new Date(attributes.endDate).toLocaleDateString("en-uk")} ` : ""}</p>
+                                <p class="card-text text-limit"><small
+                                            class="badge rounded-pill  " 
+                                               style="background-color: ${colorEventType}; color:${colorText};" >${attributes.type}</small>
+                                    </p>
+                            </div>
+                        </div>
+                     </div> </a>`;
+      }).join("");
+
+      const eventContainer = document.querySelector(".event-container")
+      const noEventsContainer = document.querySelector("#events-container-list")
+
+      if (eventList.length > 0) {
+        eventContainer.innerHTML = eventList
+      } else {
+        eventContainer.innerHTML = `<div class="m-recommended-slider__item swiper-slide">
+                                        <div class="m-heading no-margin">
+                                          <h3>Nenhum evento encontrado</h3>
+                                          <p>
+                                          Aparentemente, não há publicações no momento, verifique novamente mais tarde
+                                          </p>
+                                        </div>
+                                        <article class=" container pt-3" id="events-container-list">
+                                          <div class="row row-cols-1 row-cols-md-4 g-4 event-container">
+
+                                          </div>
+                                        </article>
+                                      </div>`;
+      }
+    }
+
+    async function fetchEvents() {
+
+
+
+
+
+      const country = "Portugal";
+      queryFilter = `query($country: String) {
+          events(
+            filters:{location:{country:{eq:$country}}}
+            pagination:{page: ${paginationPage}, pageSize:12}
+            ) {
+      `
+
+
+      query.filter = `filters:{location:{country:{eq:$country}}}`
+      query.variables = !country ? {} : {
+        "country": country
+      }
+      query.parameters = `$country: String`
+      await displayLoading()
+      const endpoint = apibaseurl + "/graphql";
+      const headers = {
+        "content-type": "application/json",
+      };
+      const queryData = `
+                meta{
+                  pagination{
+                    total
+                    page
+                    pageCount
+                    pageSize
+                  }
+                }
+                data {
+                    id
+                    attributes {
+                    type
+                    name
+                    description
+                    startDate
+                    endDate
+                    }
+                    attributes{
+                      location{
+                        data{
+                          attributes{
+                            country
+                            City
+                            geolocation
+                          }
+                        }
+                      }
+                    }
+                    attributes{
+                    cover{
+                        data{
+                        id
+                        attributes{
+                            url
+                        }
+                        }
+                    }
+                    }
+            }`
+      //const filter = queryFilter ? queryFilter : `query {events(pagination:{page: ${paginationPage}, pageSize:12}){`
+      const filter = query.queryString()
+      const graphqlQuery = {
+        "query": `
+          ${filter}
+            ${queryData}
+            }
+          }
+          `,
+        "variables": query.variables//queryVars ? queryVars : {},
+      }
+
+      const options = {
+        "method": "POST",
+        "headers": headers,
+        "body": JSON.stringify(graphqlQuery)
+      };
+
+      const response = await fetch(endpoint, options);
+      const data = await response.json();
+
+      return data
+    }
+
+    async function displayLoading() {
+
+      const eventContainer = document.querySelector(".event-container")
+      eventContainer.innerHTML =
+        `<div class="m-recommended-slider__item swiper-slide">
+                                        <div class="m-heading no-margin">
+                                          <div class="spinner-border" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                          </div>
+                                        </div>
+                                        <article class=" container pt-3" id="events-container-list">
+                                          <div class="row row-cols-1 row-cols-md-4 g-4 event-container">
+
+                                          </div>
+                                        </article>
+                                      </div>`;
+
+      const promise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve()
+        }, 1000)
+      })
+      return promise
+    }
+
+    function generateGhostCard(eventData) {
+      const [url, title, description, image, date, location, id] = eventData;
+      return `
+      
+      `
+    }
+
+
+    async function reload() {
+      // fetch data and update list
+      const eventData = await fetchEvents()
+      await updateEventList(eventData)
+
+      // comput pagination data
+      const paginationObj = eventData.data.events.meta.pagination;
+      const { total, pageCount, pageSize, page } = paginationObj;
+
+      const numberOfItems = total // ("#event-container a").length;;
+      const limitPerPage = pageSize // 16; //How many card items visible per a page
+      const totalPages = pageCount //Math.ceil(numberOfItems / limitPerPage);
+      const paginationSize = 7; //How many page elements visible in the pagination
+      let currentPage;
+
+      // pagination numbers 
+      async function showPage(whichPage) {
+        if (whichPage < 1 || whichPage > totalPages) return false;
+        currentPage = whichPage;
+        // set pagination page for next fetch of data
+        paginationPage = whichPage
+        query.pagination = `pagination:{page: ${currentPage}, pageSize:12}`
+        const data = await fetchEvents()
+        updateEventList(data)
+        //$(".event-container a").hide().slice((currentPage - 1) * limitPerPage, currentPage * limitPerPage).show();
+
+        $(".pagination li").slice(1, -1).remove();
+
+        getPageList(totalPages, currentPage, paginationSize).forEach(item => {
+          $("<li>")
+            .addClass("page-item justify-content-center")
+            .addClass(item ? "current-page" : "dots")
+            .toggleClass("active", item === currentPage)
+            .append($("<a>")
+              .addClass("page-link")
+              .attr({ href: "javascript:void(0)" })
+              .attr({ "style": `border-radius: 50% !important;margin: 0 5px;` })
+              .text(item || "..."))
+            .insertBefore(".next-page");
+        });
+
+        $(".previous-page").toggleClass("disable", currentPage === 1);
+        $(".next-page").toggleClass("disable", currentPage === totalPages);
+        return true;
+      }
+
+      // Update pagination arrows 
+      if (totalPages < 1) {
+        $(".pagination").hide()
+        return
+      } else {
+        $(".pagination").show()
+        // pagination arrows
+        $(".pagination")
+          .append($("<li>")
+            .addClass("page-item")
+            .addClass("previous-page")
+            .append($("<a>")
+              .addClass("m-icon-button filled in-pagination-left")
+              .attr({ href: "javascript:void(0)" })
+              .attr({ "aria-label": "Previous page" })
+              .prepend($("<span>")
+                .addClass("icon-arrow-left"))
+            ),
+            $("<li>")
+              .addClass("page-item")
+              .addClass("next-page")
+              .append($("<a>")
+                .addClass("m-icon-button filled in-pagination-right")
+                .attr({ href: "javascript:void(0)" })
+                .attr({ "aria-label": "Next page" })
+                .prepend($("<span>")
+                  .addClass("icon-arrow-right")))
+          );
+
+        //$(".event-container").show();
+
+        showPage(1);
+      }
+
+      $(document).on("click", ".pagination li.current-page:not(.active)", function () {
+        return showPage(+$(this).text());
+      });
+
+      $(".next-page").on("click", function () {
+        return showPage(currentPage + 1);
+      });
+
+      $(".previous-page").on("click", function () {
+        return showPage(currentPage - 1);
+      });
+    }
+
+    function getPageList(totalPages, page, maxLength) {
+      function range(start, end) {
+        return Array.from(Array(end - start + 1), (_, i) => i + start);
+      }
+
+      var sideWidth = maxLength < 9 ? 1 : 2;
+      var leftWidth = (maxLength - sideWidth * 2 - 3) >> 1;
+      var rightWidth = (maxLength - sideWidth * 2 - 3) >> 1;
+
+      if (totalPages <= maxLength) {
+        return range(1, totalPages);
+      }
+
+      if (page <= maxLength - sideWidth - 1 - rightWidth) {
+        return range(1, maxLength - sideWidth - 1).concat(0, range(totalPages - sideWidth + 1, totalPages));
+      }
+
+      if (page >= totalPages - sideWidth - 1 - rightWidth) {
+        return range(1, sideWidth).concat(0, range(totalPages - sideWidth - 1 - rightWidth - leftWidth, totalPages));
+      }
+
+      return range(1, sideWidth).concat(0, range(page - leftWidth, page + rightWidth), 0, range(totalPages - sideWidth + 1, totalPages));
+    }
+
+
+    async function onClickSearch(event) {
+      //on page load
+      const searchbox = document.querySelector("#search-box")
+      const searchButton = document.querySelector("#search-button");
+      // let search_term = '';
+
+      searchButton.onclick = async function () {
+
+        //search button
+        if (searchbox.value.length > 0) {
+          //search_term = searchbox_value;
+
+
+          /*const filterQuery = `
+                              query SearchByNameAndDescriptionAndTypeAndLocation($search_param:String){
+                                events (filters:{or:
+                                [
+                                    {name:{contains:$search_param}},
+                                    {description:{contains:$search_param}},
+                                    {type:{contains:$search_param}},
+                                    {location:{country:{contains:$search_param}},
+                                    }
+                                ]
+                                }){
+                                `
+          const queryVars = {
+            search_param: searchbox.value,
+          }*/
+
+          query.filter = `filters:{or:
+                                [
+                                    {name:{containsi:$search_param}},
+                                    {description:{containsi:$search_param}},
+                                    {type:{containsi:$search_param}},
+                                    {location:{country:{containsi:$search_param}},
+                                    }
+                                ]
+                                }`
+          query.parameters = `$search_param:String`
+          query.variables = {
+            search_param: searchbox.value,
+          }
+
+          //const eventdata = await fetchEvents(filterQuery, queryVars);
+          //updateEventList(eventdata)
+          await reload()
+
+        }
+      }
+    }
+  </script>
