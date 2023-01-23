@@ -21,11 +21,11 @@
   <meta name="google-site-verification" content="VQ6ikxWand0AXUKyCIIHYluKqKqhR-9rUeHYWE9Z0Rg" />
 
   {{!-- Preload assets --}}
-  <link rel="preload" href="{{asset "css/app.css"}}" as="style" />
-  <link rel="preload" href="{{asset "js/manifest.js"}}" as="script" />
-  <link rel="preload" href="{{asset "js/vendor/content-api.min.js"}}" as="script" />
-  <link rel="preload" href="{{asset "js/vendor.js"}}" as="script" />
-  <link rel="preload" href="{{asset "js/app.js"}}" as="script" />
+  <link rel="preload" href="{{asset " css/app.css"}}" as="style" />
+  <link rel="preload" href="{{asset " js/manifest.js"}}" as="script" />
+  <link rel="preload" href="{{asset " js/vendor/content-api.min.js"}}" as="script" />
+  <link rel="preload" href="{{asset " js/vendor.js"}}" as="script" />
+  <link rel="preload" href="{{asset " js/app.js"}}" as="script" />
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -35,7 +35,7 @@
   {{!-- bootstrapi icon --}}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
   {{!-- custom styles --}}
-  <link rel="stylesheet" href="{{asset "css/custom.css"}}" />
+  <link rel="stylesheet" href="{{asset " css/custom.css"}}" />
   {{!-- This #block helper will try to preload page-specific assets --}}
   {{{block "preload"}}}
 
@@ -89,7 +89,7 @@
     }
   </style>
 
-  <link rel="stylesheet" type="text/css" href="{{asset "css/app.css"}}" media="screen" />
+  <link rel="stylesheet" type="text/css" href="{{asset " css/app.css"}}" media="screen" />
 
   {{!-- This #block helper will inject a stylesheet for a specific page --}}
   {{{block "styles"}}}
@@ -112,7 +112,7 @@
   <script>
     // @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt Expat
     const ghostHost = "{{@site.url}}"
-    const apibaseurl = "http://app.nextdoor-project.org:8000"
+    const apibaseurl = "https://nextdoor-backoffice.up.railway.app"
       // @license-end
   </script>
   {{#if @custom.search_api_key}}
@@ -144,11 +144,11 @@
   {{> footer-pt}}
 
   {{!-- Common scripts shared between pages --}}
-  <script defer src="{{asset "js/manifest.js"}}"></script>
-  <script defer src="{{asset "js/vendor/content-api.min.js"}}"></script>
-  <script defer src="{{asset "js/vendor.js"}}"></script>
-  <script defer src="{{asset "js/app.js"}}"></script>
-  <script defer src="{{asset "js/bootstrap.min.js"}}"></script>
+  <script defer src="{{asset " js/manifest.js"}}"></script>
+  <script defer src="{{asset " js/vendor/content-api.min.js"}}"></script>
+  <script defer src="{{asset " js/vendor.js"}}"></script>
+  <script defer src="{{asset " js/app.js"}}"></script>
+  <script defer src="{{asset " js/bootstrap.min.js"}}"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
     integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
